@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>角色详细信息信息</title>
+<link rel="stylesheet" type="text/css"href="../../resources/js/bootstrap/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css"href="../../resources/js/jquery/css/jquery.treetable.css" />
+<link rel="stylesheet" type="text/css"href="../../resources/js/jquery/css/jquery.treetable.theme.default.css" />
+<link rel="stylesheet" type="text/css" href="../../resources/js/layer-v3.0.1/skin/default/layer.css"/>
+
+<script type="text/javascript"src="../../resources/js/jquery/jquery-3.4.0.min.js"></script>
+<script type="text/javascript"src="../../resources/js/jquery/jquery.treetable.js"></script>
+<script type="text/javascript" src="../../resources/js/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../resources/js/layer-v3.0.1/layer.js"></script>
+<script src="../../js/util/common_util.js"></script>
+ <style type="text/css">  
+        table{font-size:16px;}  
+        table.treetable thead tr th,table.treetable tbody tr td{padding:10px 1em;}  
+        table.treetable tbody tr td{border-top:1px solid #ccc;}  
+        table tr:hover{background:#F7F6A5 !important;}  
+        table td a.del{color:#f00;}  
+        table td a.add{color:green;}  
+        
+        button {		    
+		    border: none;		    
+		    padding: 4px 10px;
+		    text-align: center;
+		    text-decoration: none;
+		    display: inline-block;
+		    font-size: 16px;
+		    margin: -5px 9px;
+		    cursor: pointer;
+		}
+		.del {
+			border-radius: 4px;
+			font-size: 8px;
+			color:#FFFFFF;
+			background-color: #F00000;
+		}
+		.add {
+			border-radius: 4px;
+			font-size: 8px;
+			color:black;
+			background-color: #99CC00;
+		}
+		.add_root {
+			border-radius: 4px;
+			font-size: 8px;
+			color:black;
+			background-color: #CCCC99;
+		}
+    </style>  
+<script type="text/javascript">
+$(function(){  
+	   init_tree_table();
+})  
+function init_tree_table(){  
+     $.ajax({            
+		  loading : false,            
+		  sync: false,     
+		  url : "../../role/operation_list.do",             
+		  data: "id=-1",  
+		  type:"post",
+		  dataType:"json",
+		  success:function(data) { 
+			var data = JSON.parse(data);    					
+			var html = generateHtml("-1",data);    
+			$("#tree_table tbody").append(html);//根初始化
+		  	set_tree_table(); //表格初始化
+		}      
+	});        
+}
+function set_tree_table(){
+    $("#tree_table").treetable({  
+    	theme:"vsStyle",
+        nodeIdAttr: "nodeId",  
+        parentIdAttr: "parentId",  
+        stringCollapse: "收起",  
+        stringExpand: "展开",  
+        expandable: true,                        
+        onNodeExpand: function(){  //展开时调用 
+            var node = this;  
+            //是否已经加载  
+            if(node.children && !node.children.length ){  
+          	  var data = "id="+node.id;
+          	  $.ajax({            
+      			  loading : false,            
+      			  sync: true,// Must be false, otherwise loadBranch happens after showChildren?         
+ 					  url : "../../role/operation_list.do",             
+ 					  data: data,  
+ 					  type:"post",
+ 					  dataType:"json",
+ 					  success:function(data) { 
+ 						var data = JSON.parse(data);    						
+  					 	var html = generateHtml(node.id,data);      					
+                    	$("#tree_table").treetable("loadBranch",node,html);    
+      				}      
+      		  });                     
+            }               
+        }  
+    }).on("click",".del",function(e){  
+        e.preventDefault();  
+        var id = $(this).closest("tr").data("node-id");   
+        del_operation(id);       
+    }).on("click",".add",function(e){  
+        e.preventDefault();  
+        var id = $(this).closest("tr").data("node-id");  
+        //修改节点图标  
+	    $(this).closest("tr").find("td .file").removeClass("file").addClass("folder");    
+        openEicket(id);//打开窗口
+    }).on("click",".add_root",function(e){  
+        e.preventDefault();         
+        openEicket("-1");//打开窗口
+    }); 
+}
+//数组对象拼接
+function generateHtml(parent_id,data){            
+    var html = '';  
+    $.each(data,function(i,item){  
+    	html += getHtml(parent_id,item );
+    });  
+   return html;  
+}
+//对象拼接
+function getHtml(parent_id,item){
+	if( item.parent_id == "-1" ){
+		item.isParent = true;
+	}
+	var html = '';
+	html += '<tr data-node-id="' + item.id + '"data-parent-id="'+parent_id+'"data-tt-branch="' + (item.isParent ? "true" : "false")+ '">' +   
+	    '<td>' +   
+	    (item.isParent ? '<span class="folder"></span>' :'<span class="file"></span>') +  
+	    item.name + '</td>' +   
+	    '<td>' +  item.description + '</td>' +  
+	    '<td>' +  item.permission + '</td>' + 
+	    '<td><button type="button" class="del">删除</button> <button type="button" class="add">添加下级</button> '+
+	    ("-1"===parent_id ?'<button type="button" class="add_root">添加同级</button>':"")+
+	    '</td>'+ 
+	    '</tr>';  
+    return html;
+}
+/*添加操作权限
+ * 父节点id
+ */
+function openEicket(id){
+	$(".add_Modal").val(id);
+	$(".add_Modal").click();	      
+}
+/**
+ * 添加操作权限，确认提交数据
+ * 
+ */
+function submit_data(){
+	var parrnt_id = $(".add_Modal").val();
+	var obj = {};
+	var close = 0;
+	$("#form_permission input").each(function(){//遍历表单非空判断，数据序列化到obj中
+		var item = $(this);
+		var temp = item.attr("id");
+		obj[temp]=item.val();
+		if(!item.val()){
+			close++;
+			item.focus();
+			return false;
+		}
+	});
+	if( close == 0 ){
+		$("#close").click();
+		obj.parent_id=parrnt_id;
+		var data = JSON.stringify(obj);
+		$.ajax({            
+			  loading : false,            
+			  sync: false,     
+			  url : "../../role/operation_add.do",             
+			  data: data,  
+			  type:"post",
+			  dataType:"json",
+			  contentType:"application/json;charset=UTF-8",
+			  success:function(data) { 
+				if(data.state == 1){
+					var html = getHtml(parrnt_id,data.data);  
+				    
+				    var node = $("#tree_table").treetable("node",parrnt_id);//获取当前节点
+				         
+				    $("#tree_table").treetable("loadBranch",node,html);               				   
+				}else{
+					show_message("错误信息",data.messages);
+				}
+			},
+			error:function(e){
+				show_message("错误","服务器出点问题");
+			}
+			
+		});        		    
+	}
+}
+/**
+ * 删除权限
+ */
+function del_operation(id){
+	layer.confirm("确定要删除吗?",{btn: ['确定', '取消'],title:"提示"},function(){
+		$.ajax({
+			url:"../../role/operation_del.do",
+			type:"post",
+			data:"id="+id,
+			dataType:"json",
+			success:function(data){
+				if(data.state == 1){
+					 $("#tree_table").treetable("removeNode",id);  
+					 layer.msg("删除成功", {icon: 1});
+				}else{
+					 layer.msg(data.messages, {icon: 2});
+				}
+			}
+		});
+	});    	    
+}
+</script>
+</head>
+<body>
+	 <div id="main">  
+       <table id="tree_table">  
+        <thead>  
+          <tr>  
+            <th>名称</th>  
+            <th>描述</th> 
+            <th>权限</th>  
+            <th>操作</th>  
+          </tr>  
+        </thead>  
+        <tbody>                     
+        </tbody>  
+      </table>  
+    </div>  
+	<input type="hidden" class="add_Modal" data-toggle="modal" data-target="#add_Modal" value="">
+  	<div class="modal fade" id="add_Modal">
+	    <div class="modal-dialog">
+	      <div class="modal-content">
+	        <div class="modal-header">
+	          <h4 class=" container modal-title alert alert-primary"><span class="text-center">添加权限</span><button type="button" class="close" data-dismiss="modal">&times;</button></h4>	          
+	        </div>
+	        <div class="modal-body ">
+	        	<form id="form_permission">
+				    <div class="form-group">
+				      <label for="operation_name">名称:</label>
+				      <input type="text" class="form-control" id="name" placeholder="请输入名称">
+				    </div>
+				    <div class="form-group">
+				      <label for="description">描述:</label>
+				      <input type="text" class="form-control" id="description" placeholder="请输入描述">
+				    </div>
+				     <div class="form-group">
+				      <label for="permission">权限:</label>
+				      <input type="text" class="form-control" id="permission" placeholder="请输入权限">
+				    </div>				    
+			  </form>
+	        </div>	   
+	        <div class="modal-footer">
+	        	<button type="button" class="btn btn-primary"  onclick="submit_data()">确认</button>
+	          	<button type="button" class="btn btn-secondary" id="close"data-dismiss="modal">关闭</button>
+	        </div>	   
+	      </div>
+	    </div>
+  	</div>    
+</body>
+</html>

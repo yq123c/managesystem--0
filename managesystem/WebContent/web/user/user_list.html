@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<title>主页</title>
+<meta charset="utf-8">
+<!-- 移动设备优先 -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" type="text/css" href="../../resources/js/bootstrap/css/bootstrap.css"/>
+<link rel="stylesheet" type="text/css" href="../../resources/js/bootstrap/css/bootstrap-theme.min.css"/>
+<link rel="stylesheet" type="text/css" href="../../resources/js/bootstrap/bootstrapTable/css/bootstrap-table.css"/>
+
+<link rel="stylesheet" type="text/css" href="../../resources/js/layer-v3.0.1/skin/default/layer.css"/>
+<link rel="stylesheet" href="../../resources/font-awesome-4.7.0/css/font-awesome.css">
+
+<script type="text/javascript" src="../../resources/js/jquery/jquery-3.4.0.min.js"></script>
+
+<script type="text/javascript" src="../../resources/js/bootstrap/js/popper.min.js"></script>
+<script type="text/javascript" src="../../resources/js/bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript" src="../../resources/js/bootstrap/bootstrapTable/bootstrap-table.js"></script>
+<script type="text/javascript" src="../../resources/js/bootstrap/bootstrapTable/locale/bootstrap-table-zh-CN.js"></script>
+<script type="text/javascript" src="../../resources/js/layer-v3.0.1/layer.js"></script>
+<script type="text/javascript" src="../../js/util/common_util.js"></script>
+<script type="text/javascript">
+$(function(){
+	InitTable();
+});
+//初始化
+ var InitTable = function () {
+     //先销毁表格
+     $('#tbl_user').bootstrapTable("destroy");
+     //加载表格
+     $('#tbl_user').bootstrapTable({
+        rowStyle: function (row, index) {//row 表示行数据，object,index为行索引，从开始
+             var style = "";
+             if (index % 2 == 0) {
+                 style = { css: { 'color': '#212529' ,'background-color':'#4ed0e4'} };
+             }else{
+            	 style = { css: { 'color': '#212529' ,'background-color':'#5ed078'} };
+             }                      
+             return  style;
+         }, 
+         undefinedText: '',
+         //striped: true,                      //是否显示行间隔色
+         showHeader: true,     //是否显示列头
+         resizable: false,
+         showFullscreen: true,        
+         showRefresh : true,//刷新按钮()
+         showLoading: true,
+         cardView: false,
+         showToggle: true,//切换视图
+         showColumns: true,                  //是否显示所有的列
+         //icons: {refresh: "fa-refresh"},//若图标不显示或想做修改，在此配置
+         silent: true,
+         url: "../user/list.do",
+         method: 'POST',                      //请求方式（*）
+         contentType:"application/x-www-form-urlencoded",
+         toolbar: '#toolbar',                //工具按钮用哪个容器        
+         cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+         pagination: true,                   //是否显示分页（*）
+         sortable: true,                     //是否启用排序
+         sortOrder: "asc",                   //排序方式
+         queryParamsType:'limit',         
+         sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+         pageNumber: 1,                       //初始化加载第一页，默认第一页
+         pageSize:8,                       //每页的记录行数（*）
+         pageList: [8,12,15,20],        //可供选择的每页的行数（*）         
+         clickToSelect: true,                //是否启用点击选中行       
+         uniqueId: "id",                     //每一行的唯一标识，一般为主键列  
+         detailView: false,                   //是否显示父子表            
+         showExport: true,				//导出数据
+         exportDataType: 'all',    //导出全部
+        // exportDataType: "selected",        //导出checkbox选中的行数
+         exportTypes:['excel'],  //导出文件类型       
+         paginationLoop: false,             //是否无限循环
+         queryParams: function (params) {
+             var temp = {  
+                     limit: params.limit,   //单页记录数
+                     offset: params.offset,  //页码
+                     sort: params.sort,      //排序列名  
+                     order: params.order, //排序方式
+                     name:$("#name").val(),
+                     login_name:$("#login_name").val()
+                 };
+                 return temp;
+             },
+         columns: [
+         {
+                 field: 'id',
+                 title: 'id',
+                 visible:false
+         }, {
+                 field: 'name',
+                 title: '名字',
+                 sortable: true
+         }, {
+             field: 'login_name',
+             title: '登录名'
+    	 }, {
+             field: 'phone',
+             title: '电话'
+     	}, {
+            field: 'address',
+            title: '地址'
+    	}, {
+            field: 'create_time',
+            title: '注册时间',
+            sortable: true
+    	},{
+            field: '',
+            title: '操作',
+            formatter:function(value,row,index){
+            	var btn = "<button type='button' class='btn btn-primary btn-sm' onclick=\"showContent(\'update_user\',\'user/user_update.html?update=update&id="+row.id+"\')\">修改</button>&nbsp;&nbsp;"+
+            					"<button type='button' class='btn btn-danger btn-sm' onclick=\"delete_user(\'"+row.id+"\')\">删除</button>";
+            	return btn;
+            }
+    	}]
+     });
+     return InitTable;
+ };
+ function query_update(){
+	 $('#tbl_user').bootstrapTable("resetSearch");
+ }
+ function  showContent(id,src){	
+	 window.parent.showContent(id,src);
+ }
+ function delete_user(id){
+	 console.log(id);
+	 layer.msg('确定删除此用户？', {
+		  icon: 5,
+		  time:0,
+		  offset: '188px',
+		  shade:0.3,
+		  btn:['确定','取消'],
+		  yes:function(){
+			  $.ajax({
+				  url:"../user/delete.do",
+				  type:"post",
+				  data:{userId:id},
+				  dataType:"json",
+				  success:function(data){
+					  if( data.state == 1 ){
+							 layer.msg(data.messages, {
+								  icon: 1,
+								  offset: '188px',
+								  shade:0.3,
+								  btn:['确定'],
+								  yes:function(){
+									  query_update();//刷新表格
+									  layer.close(layer.index);
+								  }
+								});
+						}else{
+							 layer.msg(data.messages, {
+								  icon: 2,
+								  offset: '188px',
+								  shade:0.3,
+								  btn:['确定'],
+								  yes:function(){						
+									  layer.close(layer.index);
+								  }
+							});
+						}
+				  }
+			  });
+		  },
+		  btn2:function(){
+			  layer.close(layer.index);
+		  }
+		});
+ }
+</script>
+<style type="text/css">
+#tbl_user > thead th {
+      padding: 0;
+      margin: 0;
+      background-color: #ffc107;
+      text-align: center;
+}
+ #tbl_user tbody > tr:hover {
+       background-color: #dc3545;    
+}
+ #tbl_user tbody > tr{
+ 	text-align: center;h
+ }
+</style>
+</head>
+<body>
+	<div class="container">
+ <div class="row">
+  <div class="table-responsive">
+   <div id="toolbar">
+    	 <div class="input-group ">
+		      <input type="text" class="form-control" placeholder="名字" id="name" name="name">&nbsp;&nbsp;    
+		      <input type="text" class="form-control" placeholder="登录名" id="login_name" name="login_name">&nbsp;&nbsp;       
+		      <button type="button" class="btn btn-info" onclick="query_update()">查询</button>&nbsp;&nbsp;  
+		      <button type="button" class="btn btn-success" onclick="showContent('add_user','user/user_add.html')">新增</button>&nbsp;&nbsp;  
+		    </div>
+   </div>
+   <table id="tbl_user"></table>
+  </div>
+ </div>
+</div>
+</body>
+</html>

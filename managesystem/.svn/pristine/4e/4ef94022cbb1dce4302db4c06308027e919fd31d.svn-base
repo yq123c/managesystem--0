@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD SQL MAP Config 3.1//EN"
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <settings>
+  	<!-- 配置：当返回类型是map，而数据库查出的字段为空时，true表示此字段为null，false表示该字段会被过滤掉  -->
+    <setting name="callSettersOnNulls" value="true"/>
+
+  </settings>
+  <typeAliases>
+  	<typeAlias type="com.five.managesystem.user.entity.PagingVo" alias="PagingVo" />
+  </typeAliases>
+</configuration>

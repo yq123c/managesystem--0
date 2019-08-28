@@ -1,0 +1,267 @@
+package com.five.managesystem.user.service;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.apache.shiro.crypto.hash.SimpleHash;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.five.managesystem.common.context.ApplicationContexUtils;
+import com.five.managesystem.common.util.CommonUtils;
+import com.five.managesystem.common.util.UUIDUtil;
+import com.five.managesystem.login.credentials.RetryLimitHashedCredentialsMatcher;
+import com.five.managesystem.user.dao.UserDao;
+import com.five.managesystem.user.entity.PagingVo;
+import com.five.managesystem.user.entity.UserVo;
+import com.five.managesystem.user.exception.AccountExistException;
+
+/**
+ * @author 陆昌
+ * @time 2019年4月25日上午9:14:07
+ * 说明：
+ */
+@Service
+public class UserService {
+	@Autowired UserDao userDao;
+	 /**
+     * 根据登录名查找用户
+     * @param username
+     * @return
+     */
+    public Map<String,String> findByUsername(String username) {
+        return userDao.findByUsername(username);
+    }
+    
+    /**
+     * 根据用户id查找用户
+     * @param id
+     * @return
+     */
+    public Map<String,String> findById(String id) {
+        return userDao.findById(id);
+    }
+    
+	/**
+     * 根据用户名查找其角色和所有权限
+     * @param username
+     * @return
+     */
+    public Map<String,Set<String>> findRolesAndPermissions(String username) {
+    	 /*查询用户的所有角色信息*/
+        List<Map<String,String>> queryRoles = userDao.findRoles(username);
+        Set<String> roles = null;//角色
+        Set<String> permissions = null;//权限
+        Map<String,Set<String>> result = null;//返回结果
+        if( queryRoles != null ) {
+        	roles = new HashSet<String>();
+        	permissions = new HashSet<String>();
+        	result = new HashMap<String,Set<String>>();
+        	for( Map<String,String> r : queryRoles ) {
+        		roles.add(r.get("ROLENAME"));
+        		/*通过角色id查询角色拥有的权限*/
+        		List<Map<String,String>> queryPermissions= userDao.findPermissions(r.get("ROLEID"));
+        		for( Map<String,String> P : queryPermissions ) {
+        			permissions.add(P.get("PERMISSION"));
+        		}
+	    	}	
+        	result.put("roles", roles);
+        	result.put("permissions", permissions);
+        }
+        return result;
+    }
+    
+    /**
+     * 添加用户
+     * @param user
+     * @return
+     * @throws AccountExistException 
+     */
+    public int addUser(UserVo user) throws AccountExistException{
+  
+    	if (findByUsername(user.getLoginName()) != null){
+    		throw new AccountExistException();
+    	}
+    	
+    	String id = UUIDUtil.getUUID();
+    	user.setId(id);
+    	RetryLimitHashedCredentialsMatcher metcher = ApplicationContexUtils.getContext().getBean("credentialsMatcher",RetryLimitHashedCredentialsMatcher.class);
+    	//SimpleHash参数：标识算法名称，散列对象，散列使用的salt值，散列次数
+    	user.setPassword(new SimpleHash(metcher.getHashAlgorithmName(), user.getPassword(), id, metcher.getHashIterations()).toString());
+    	return userDao.addUser(user);
+    }
+    
+    /**
+     * 查询用户
+     * @param map
+     * @return
+     */
+    public List<Map<Object,Object>> findUser(PagingVo params){
+    	
+    	if ("DEPT_NAME".equals(params.getSort())){
+    		params.setSort("DEPT_ID");
+    	}
+    	
+    	if ("ORGANIZATION_NAME".equals(params.getSort())){
+    		params.setSort("ORGANIZATION_ID");
+    	}
+    	
+    	return userDao.findUser(params);
+    }
+    
+    
+    /**
+     * 按id更新用户信息
+     * @param user
+     * @return
+     */
+    public int updateUserById(UserVo user){
+    	return userDao.updateUserById(user);
+    }
+    
+ 
+    /**
+     * 按id更新用户信息，判断提交数据是否和数据库一样
+     * @param user
+     * @param type 方法重载，区别另一个方法
+     * @throws AccountExistException
+     * @return
+     */
+    @Transactional
+    public Map<?,?> updateUserById(UserVo user,String type){
+    	
+    	Map<?,?> newData = findById(user.getId());
+
+    	//和数据库一样的信息就清空不更新
+    	if (user.getPassword().equals(CommonUtils.getMapValue(newData, "PASSWORD"))){
+    		user.setPassword(null);
+    	} else{
+    		//密码加密
+        	RetryLimitHashedCredentialsMatcher metcher = ApplicationContexUtils.getContext().getBean("credentialsMatcher",RetryLimitHashedCredentialsMatcher.class);
+        	String password = new SimpleHash(metcher.getHashAlgorithmName(), user.getPassword(), user.getId(), metcher.getHashIterations()).toString();
+    		user.setPassword(password);
+    	}
+    	
+    	if (CommonUtils.getMapValue(newData, "LOGIN_NAME").equals(user.getLoginName())){
+    		user.setLoginName(null);
+    	} else{
+    		if (findByUsername(user.getLoginName()) != null)
+    			throw new AccountExistException();
+    	}
+    		
+    	
+    	if (CommonUtils.getMapValue(newData, "REAL_NAME").equals(user.getRealName()))
+    		user.setRealName(null);
+    	
+    	if (CommonUtils.getMapValue(newData, "ORGANIZATION_ID").equals(user.getOrganizationID()))
+    		user.setOrganizationID(null);
+    	
+    	if (CommonUtils.getMapValue(newData, "DEPT_ID").equals(user.getDeptID()))
+    		user.setDeptID(null);
+    	
+    	if (CommonUtils.getMapValue(newData, "LOCKED").equals(user.getLocked()))
+    		user.setLocked(null);
+    	
+    	if (CommonUtils.getMapValue(newData, "USER_TYPE").equals(user.getUserType()))
+    		user.setUserType(null);
+    	
+    	if (CommonUtils.getMapValue(newData, "PHONE").equals(user.getPhone()))
+    		user.setPhone(null);
+    	
+    	if (CommonUtils.getMapValue(newData, "MOBILE").equals(user.getMobile()))
+    		user.setMobile(null);
+    	
+    	if (CommonUtils.getMapValue(newData, "EMAIL").equals(user.getEmail()))
+    		user.setEmail(null);
+    	//修改用户角色
+    	Set<String> rolesId = user.getRoleCheckBoxs();//获取所有选中的角色
+    	addRoleForUser(user.getId(),rolesId);
+    	//修改用户基本信息
+    	if (userDao.updateUserById(user) > 0)
+    		return findById(user.getId());
+    	   	
+    	return null;
+    }
+    /**
+     * 为用户添加/修改角色
+     * @param userId 用户ID
+     * @param rolesId 角色ID列表
+     */
+    public void addRoleForUser(String userId,Set<String> rolesId) {
+		/*已经存在的角色信息*/
+		Set<String> existRoleInfo = userDao.getRolesByUserId(userId);
+		if( rolesId != null ) {
+			for( String role : rolesId  ) {		
+				/*
+				 * 判断用户是否已经存在该角色
+				 */
+				boolean exist =existRoleInfo.contains(role);
+				if( !exist ) {//如果不存在，则新增					
+					userDao.addUserRoleInfo(userId, role);
+				}else {
+					/*
+					 * 如果已经存在，把该记录在existRoleInfo中移除
+					 * 那么本次遍历完之后existRoleInfo剩下的就是要删除的角色信息
+					 */
+					existRoleInfo.remove(role);
+				}			
+			}
+		}		
+		for( String role : existRoleInfo  ) {		
+			userDao.deleteUserRoleInfo(userId, role);//删除			
+		}
+    }
+    
+    /**
+     * 按id修改用户登录IP和登录时间
+     * @return
+     */
+    public int updateLoginInfoById(Map<?,?> map,String loginIP){
+    	
+    	UserVo user = new UserVo();
+    	
+    	user.setId(map.get("ID").toString());
+    	
+    	user.setLoginDate(new Date());
+    	user.setLoginIP(loginIP);
+    	
+    	user.setLastDate(map.get("LOGIN_DATE") != null?(Date)map.get("LOGIN_DATE"):new Date());
+    	user.setLastIP(CommonUtils.getMapValue(map, "LOGIN_IP"));
+    	user.setLastIP(loginIP);
+    	return updateUserById(user);
+    }
+    
+    
+    
+    /**
+     * 查询所有用户数量
+     * @return
+     */
+    public int findTotalUsers(PagingVo params){
+    	return userDao.findTotalUsers(params);
+    }
+    
+    
+    /**
+     * 根据用户id删除用户
+     * @param id
+     * @return
+     */
+    public int deleteById(String id){
+    	return userDao.deleteById(id);
+    }
+    
+    /**
+     * 查询用户类型
+     * @return
+     */
+    //@RequiresRoles({"user"})
+   // @RequiresPermissions({"selectUserType"})
+    public List<Map<String,String>> findUserType(){
+    	return userDao.findUserType();
+    }
+    
+}

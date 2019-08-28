@@ -1,0 +1,34 @@
+package com.five.managesystem.user.exception;
+
+/**
+ * @author 陆昌
+ * @time 2019年5月9日上午9:52:52
+ * 说明：账号已存在异常
+ */
+public class AccountExistException extends RuntimeException{
+
+	private static final long serialVersionUID = 1L;
+
+	public AccountExistException() {
+		super();
+	}
+
+	public AccountExistException(String message, Throwable cause, boolean enableSuppression,
+			boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
+
+	public AccountExistException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public AccountExistException(String message) {
+		super(message);
+	}
+
+	public AccountExistException(Throwable cause) {
+		super(cause);
+	}
+	
+	
+}

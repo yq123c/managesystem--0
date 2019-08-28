@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<title>主页</title>
+<meta charset="utf-8">
+<!-- 移动设备优先 -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap4 核心 CSS 文件 -->
+<link rel="stylesheet" href="../resources/js/bootstrap/css/bootstrap.min.css">
+<script src="../resources/js/jquery/jquery-3.4.0.min.js"></script>
+<!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+<script src="../resources/js/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../js/util/common_util.js"></script>
+<script type="text/javascript" src="../js/index/index.js"></script>
+<link rel="stylesheet" href="../resources/font-awesome-4.7.0/css/font-awesome.css">
+<link rel="stylesheet" href="../css/common/calendar.css">
+<style type="text/css">
+.menu{
+	z-index: 100;
+}
+.card-body ul {
+	padding-left: 30px;
+}
+.card-body ul li span{
+	margin-top: 6px;
+}
+
+</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-sm bg-primary navbar-dark">
+		<a class="navbar-brand hid" href="#" onclick="showContent('home','home.html')">主页</a>	
+		<div class="collapse navbar-collapse" id="collapsibleNavbar">			
+			<i class="fa fa-cog fa-spin fa-3x"></i>
+			<i class="fa fa-bars  fa-2x" style="color: white;margin-left: 46px;"onclick="hidden_menu()"></i>
+		</div>
+		<span class="navbar-text text-dark font-weight-bold"> <i class="fa fa-user fa-2x" style="color: #ffc107;"></i><span id="login_user" style="color: #32ff0e;margin-left: 12px;">admin</span></span> &nbsp;
+		<button class="btn btn-sm btn-danger" type="button" onclick="login_out()">退出登录</button>
+</nav>
+<div class="container-fluid" style="margin-top:12px;">
+  <div class="row">
+  	  <div class="col-sm-1 "></div>
+	  <div class="menu bg-light" style="position:fixed;overflow:hidden;  height:800px;width:152px;">	
+	  		<div class="card" >
+		      <div class="card-header">
+		       <i class="fa fa-home fa-lg" onclick="hidden_menu()"></i>
+		        <a class=" collapsed card-link hid" href="##" onclick="showContent('home','home.html')">
+		          主页
+		        </a>
+		      </div>		      
+		    </div>		
+			<div class="card" >
+		      <div class="card-header">
+		       <i class="fa fa-user fa-lg" onclick="hidden_menu()"></i>
+		        <a class=" collapsed card-link hid" data-toggle="collapse" href="#collapseOne">
+		          用户管理
+		        </a>
+		      </div>
+		      <div id="collapseOne" class="collapse  show " data-parent="">
+		        <div class="card-body hid"  id="hid">	        	
+	      			  <ul>
+	      			  	<li style="list-style: none;">
+	      			  		<span  class="btn btn-primary btn-sm"  onclick="showContent('user_list','user/user_list.html')">用户列表</span>
+				           <span  class="btn btn-primary btn-sm"  onclick="showContent('add_user','user/user_add.html')">用户添加</span>				          
+				           <span  class="btn btn-primary btn-sm"  onclick="showContent('')">用户分组</span>	
+		      			 </li>	      			  	
+	      			  </ul>	      	
+		        </div>
+		      </div>
+		    </div>
+		    <div class="card" >	      
+		      <div class="card-header">
+		      	<i class="fa fa-certificate " onclick="hidden_menu()"></i>
+		        <a class="collapsed card-link  hid" data-toggle="collapse" href="#collapseTwo">
+			        机构管理
+			    </a>
+		      </div>
+		      <div id="collapseTwo" class="collapse show " data-parent="">
+		        <div class="card-body hid">
+		        	<ul>
+		        		<li style="list-style: none;">
+		        			 <span  class="btn btn-primary btn-sm"  onclick="showContent('unit_info','unit/unit_info.html')">机构列表</span> 
+		        			 <span  class="btn btn-primary btn-sm"  onclick="showContent('unit_info','unit/unit_info.html')">机构分组</span> 
+		        		</li>
+		        	</ul>			      	    
+		        </div>
+		      </div>
+		    </div>
+		    <div class="card">
+		      <div class="card-header ">
+		      <i class="fa fa-key " onclick="hidden_menu()"></i>
+		        <a class="collapsed card-link hid" data-toggle="collapse" href="#role_manage">
+		        角色管理
+		      </a>
+		      </div>
+		      <div id="role_manage" class="collapse  show" data-parent="">
+		        <div class="card-body hid">		        	
+		        	<ul>
+		        		<li style="list-style: none;">
+		        			<span  class="btn btn-primary btn-sm"  onclick="showContent('role_list','role/role_list.html')">角色列表</span>				          
+				           <span  class="btn btn-primary btn-sm"  onclick="showContent('role_add','role/add_role.html')">角色添加</span>				            
+				           <span  class="btn btn-primary btn-sm"  onclick="showContent('permission_list','role/permission_list.html')">权限列表</span>		      	        
+		        		</li>
+		           </ul>	      			
+		        </div>
+		      </div>
+		    </div>				    
+	  </div>	
+	  <iframe id="home" class="col-11" src="home.html" style="border: 0;"></iframe>	
+  </div>
+</div>
+<div class="fixed-bottom text-center " style="width: 100%;height:75px; background-color: #e9ecef;padding: 7px 0px 0px 0px;margin-top: 0px">
+  <p>技术支持-by-叶秋</p>
+  <p>qq:11570287389@qq.com</p>
+</div>
+</body>
+</html>

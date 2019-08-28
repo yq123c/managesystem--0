@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+	<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" 
+		"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.yeqiu.sys.user.dao.UserDao">
+<!-- 通过登录名查找用户信息（登录名不可重复） -->
+<select id="getUserByLoginName" resultType="map">
+SELECT
+	t.id,
+	t.organization_id,
+	t. name,
+	t.login_name,
+	t. password
+FROM
+	t_sys_user t
+WHERE
+	t.login_name = #{loginName,jdbcType=VARCHAR}
+</select>
+<!-- 通过id查找用户信息 -->
+<select id="getUserByuserId" resultType="map">
+SELECT
+	t.id,
+	t.organization_id,
+	t. name,
+	t.login_name,
+	t.phone,
+  t.email,
+	t.province,
+	t.city,
+	t.area,
+	t.address
+FROM
+	t_sys_user t
+WHERE
+	t.id =#{userId,jdbcType=VARCHAR}
+</select>
+<!-- 获取用户列表 -->
+<select id="getUserList" resultType="map">
+SELECT
+	t.id,
+	t.name,
+	t.login_name,
+	t.phone,
+	concat(
+		t.province,
+		t.city,
+		t.area,
+		t.address
+	) address,
+	t.create_time
+FROM
+	t_sys_user t
+WHERE 1=1
+	<if test="name != null">and t.name LIKE "%${name}%"</if>
+	<if test="login_name != null"> and t.login_name LIKE "%${login_name}%"</if>
+	<if test="sort != null">
+		ORDER BY t.${sort} <if test="order != null"> ${order} </if>
+	</if>
+LIMIT ${offset},${limit}
+</select>
+<!-- 获取用户列表的总记录数 -->
+<select id="getTotal" resultType="int">
+SELECT 
+	COUNT(t.id)
+FROM t_sys_user t
+WHERE 1=1
+	<if test="name != null">and t.name LIKE "%${name}%"</if>
+	<if test="login_name != null"> and t.login_name LIKE "%${login_name}%"</if>
+</select>
+<!-- 通过父级id获取地址信息列表 -->
+<select id="getAddressInfoByParentId" resultType="map">
+	SELECT t.id,t.parent_id,t.name FROM t_sys_address t where t.parent_id=#{parent_id,jdbcType=VARCHAR}
+</select>
+<!-- 添加新用户 -->
+<insert id="addUser">
+INSERT INTO t_sys_user (
+	id,
+	organization_id,
+	name,
+	login_name,
+	password,
+	phone,
+	email,
+	province,
+	city,
+	area,
+	address
+)
+VALUES(
+	#{userInfo.id,jdbcType=VARCHAR},
+	#{userInfo.organization,jdbcType=VARCHAR},
+	#{userInfo.user_name,jdbcType=VARCHAR},
+	#{userInfo.login_name,jdbcType=VARCHAR},
+	#{userInfo.password,jdbcType=VARCHAR},
+	#{userInfo.phone,jdbcType=VARCHAR},
+	#{userInfo.email,jdbcType=VARCHAR},
+	#{userInfo.province,jdbcType=VARCHAR},
+	#{userInfo.city,jdbcType=VARCHAR},
+	#{userInfo.area,jdbcType=VARCHAR},
+	#{userInfo.address,jdbcType=VARCHAR}
+)
+</insert>
+<!--根据ID删除用户  -->
+<delete id="deleteUser">
+	delete from t_sys_user where id=#{userId,jdbcType=VARCHAR}
+</delete>
+<!-- 通过登录名查找用户角色 -->
+<select id="findRoles" resultType="map">
+select 
+  sr.id roleid,
+  sr.name rolename,
+  sr.description 
+from 
+  t_sys_user t 
+  inner join t_sys_user_role sur on t.id= sur.user_id
+  left join t_sys_role sr on sur.role_id = sr.id
+where 
+  t.login_name=#{loginName,jdbcType=VARCHAR}
+</select>
+<!-- 通过角色id查找用户权限 -->
+<select id="findPermissions" resultType="map">
+select 
+  o.permission 
+from 
+  t_role_permission t
+  inner join t_sys_operation o on t.permission_id=o.id
+where
+  t.role_id=#{roleId,jdbcType=VARCHAR}
+</select>
+<!-- 更新用户信息 -->
+<update id="updateUser">
+UPDATE t_sys_user SET
+	organization_id = #{userInfo.organization,jdbcType=VARCHAR},
+	name = #{userInfo.user_name,jdbcType=VARCHAR},
+	login_name = #{userInfo.login_name,jdbcType=VARCHAR},
+	<if test='userInfo.password != ""'>
+		password = #{userInfo.password,jdbcType=VARCHAR},
+	</if>
+	phone = #{userInfo.phone,jdbcType=VARCHAR},
+	email = #{userInfo.email,jdbcType=VARCHAR},
+	province = #{userInfo.province,jdbcType=VARCHAR},
+	city = #{userInfo.city,jdbcType=VARCHAR},
+	area =#{userInfo.area,jdbcType=VARCHAR},
+	address = #{userInfo.address,jdbcType=VARCHAR}
+where
+	id = #{userInfo.id,jdbcType=VARCHAR}
+</update>
+</mapper>

@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>组织机构信息</title>
+<!-- 移动设备优先 -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../../resources/js/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css"href="../../resources/js/jquery/css/jquery.treetable.css" />
+<link rel="stylesheet" type="text/css"href="../../resources/js/jquery/css/jquery.treetable.theme.default.css" />
+<link rel="stylesheet" href="../../resources/js/layui/css/layui.css"  media="all">
+<link rel="stylesheet" href="../../resources/js/ztree/metroStyle/metroStyle.css" type="text/css">
+<link rel="stylesheet" href="../../resources/js/ztree/ztree.css" type="text/css">
+<link rel="stylesheet" href="../../css/unit-info/unitInfo.css" type="text/css">
+<link rel="stylesheet" href="../../resources/font-awesome-4.7.0/css/font-awesome.css">
+
+<script type="text/javascript" src="../../resources/js/jquery/jquery-3.4.0.min.js"></script>
+<script type="text/javascript"src="../../resources/js/jquery/jquery.treetable.js"></script>
+<script src="../../resources/js/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../resources/js/layui/layui.js"></script>
+<script type="text/javascript" src="../../resources/js/ztree/jquery.ztree.all-3.5.js"></script>
+
+<script src="../../js/util/common_util.js"></script>
+<script src="../../js/unit/unit_info.js"></script>
+<style type="text/css">  
+        table{font-size:16px;}  
+        table.treetable thead tr th,table.treetable tbody tr td{padding:10px 1em;}  
+        table.treetable tbody tr td{border-top:1px solid #ccc;}  
+        table tr:hover{background:#F7F6A5 !important;}  
+
+         button {		    
+		    border: none;		    
+		    padding: 4px 10px;
+		    text-align: center;
+		    text-decoration: none;
+		    display: inline-block;
+		    font-size: 16px;
+		    margin: -5px 9px;
+		    cursor: pointer;
+		}
+		.del {
+			border-radius: 4px;
+			font-size: 8px;
+			color:#FFFFFF;
+			background-color: #F00000;
+		}
+		.add {
+			border-radius: 4px;
+			font-size: 8px;
+			color:white;
+			background-color: #007bff;
+		}
+		.edit {
+			border-radius: 4px;
+			font-size: 8px;
+			color:white;
+			background-color: #167f2e;
+		}
+		#tree_table tbody tr td span a:HOVER{
+			background-color: #f9f9f9;
+		}
+		#tree_area{
+			position:relative;
+			top: -8px;
+		}
+		#tree_h_s{
+			position:relative;
+			top: 350px;
+			float: right;
+			color: #007bff;
+		}
+</style>
+<script type="text/javascript">
+
+</script>
+</head>
+<body>
+		<div class="container-fluid" >
+		<div class="row ">
+			<div class=" col-sm-2 zTreeBackground" id="main_left">
+				<div id="tree_area">
+					<i class="fa fa-minus-square fa-1x" id="tree_h_s" onclick="hidden_tree()"></i>
+					<ul class="ztree" id="ztree"></ul>
+				</div>
+			</div>
+			<div class="col-sm-10" id="main_right">
+				 <table id="tree_table">  
+			        <thead>  
+			          <tr>  
+			            <th>名称</th>  
+			            <th>编码</th> 
+			            <th>类型</th>  
+			            <th>操作</th>  
+			          </tr>  
+			        </thead>  
+			        <tbody>          
+			        	
+			        </tbody>  
+			      </table>  
+			</div>
+		</div>
+	</div>
+	<div id="page_bg"></div>
+	<div id="rMenu">
+		<ul>
+			<li id="m_add" onclick="addTreeNode();">添加下级</li>
+			<li id="m_del" onclick="removeTreeNode();">删除本级</li>
+			<li id="m_modify" onclick="modifyTree();">修改信息</li>
+		</ul>
+	</div>
+	<input type="hidden" class="add_Modal" data-toggle="modal" data-target="#add_Modal" value="">
+  	<div class="modal fade" id="add_Modal">
+	    <div class="modal-dialog">
+	      <div class="modal-content">
+	        <div class="modal-header">
+	          <h4 class=" container modal-title alert alert-primary"><span class="text-center">添加机构</span><button type="button" class="close" data-dismiss="modal">&times;</button></h4>	          
+	        </div>
+	        <div class="modal-body ">
+	        	<form id="form_org">
+	        		<input type="hidden" id="id" value="">
+	        		<input type="hidden" id="parent_id" value="">
+	        		<input type="hidden" id="parent_ids" value="">
+				     <div class="input-group mb-3">
+					      <div class="input-group-prepend">
+					        <span class="input-group-text">机构名称<span style="color: red;">*</span></span>
+					      </div>
+					      <input type="text" class="form-control" placeholder="输入名称" id="name">
+				    </div>
+				     <div class="input-group mb-3">
+					      <div class="input-group-prepend">
+					        <span class="input-group-text">机构编码<span style="color: red;">*</span></span>
+					      </div>
+					      <input type="text" class="form-control" placeholder="输入编码" id="org_code">
+				    </div>
+				     <div class="input-group mb-3">
+					      <div class="input-group-prepend">
+					        <span class="input-group-text">机构类型<span style="color: red;">*</span></span>
+					      </div>
+					      <select id="org_type" class="custom-select-sm form-control">
+						      <option selected value="0">请选择单位类型</option>
+						      <option value="1">单位</option>
+						      <option value="2">部门</option>
+					   	 </select>
+				    </div>
+			  </form>
+	        </div>	   
+	        <div class="modal-footer">
+	        	<button type="submit" class="btn btn-primary"   id="submit">确认</button>
+	          	<button type="button" class="btn btn-secondary" id="close"data-dismiss="modal">关闭</button>
+	        </div>	   
+	      </div>
+	    </div>
+  	</div>    
+</body>
+</html>

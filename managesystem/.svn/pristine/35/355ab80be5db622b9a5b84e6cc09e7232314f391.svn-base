@@ -1,0 +1,168 @@
+package com.five.managesystem.user.entity;
+
+import java.util.Date;
+
+/**
+ * @author 陆昌
+ * @time 2019年4月25日上午9:21:21
+ * 说明：
+ */
+public class User {
+	
+	private String id;
+	
+	private String loginName; //登录名
+	
+	private String password;  //密码
+	
+	private String delFlag; //删除标识
+	
+	private String locked;  //锁定标识
+	
+	private String organizationID; //所属机属ID
+	
+	private String unitID; //所属处室ID
+	
+	private String email; //邮箱
+	
+	private String phone; //电话
+	
+	private String mobile; //手机号
+	
+	private String userType; //用户类型(等级)
+	
+	private String duty; //职务
+	
+	private String job;  //岗位
+	
+	private String secret; //密级
+	
+	private String realName; //真实姓名
+	
+	private Date regDate; //注册时间
+	
+	private String loginIP; //最后一次登陆IP
+	
+	private Date loginDate; //最后一次登陆时间
+	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getLoginName() {
+		return loginName;
+	}
+	public void setLoginName(String loginName) {
+		this.loginName = loginName;
+	}
+	public String getDelFlag() {
+		return delFlag;
+	}
+	public void setDelFlag(String delFlag) {
+		this.delFlag = delFlag;
+	}
+	public String getLocked() {
+		return locked;
+	}
+	public void setLocked(String locked) {
+		this.locked = locked;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public String getOrganizationID() {
+		return organizationID;
+	}
+	public void setOrganizationID(String organizationID) {
+		this.organizationID = organizationID;
+	}
+	public String getUnitID() {
+		return unitID;
+	}
+	public void setUnitID(String unitID) {
+		this.unitID = unitID;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	public String getMobile() {
+		return mobile;
+	}
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+	public String getUserType() {
+		return userType;
+	}
+	public void setUserType(String userType) {
+		this.userType = userType;
+	}
+	public String getDuty() {
+		return duty;
+	}
+	public void setDuty(String duty) {
+		this.duty = duty;
+	}
+	public String getJob() {
+		return job;
+	}
+	public void setJob(String job) {
+		this.job = job;
+	}
+	public String getSecret() {
+		return secret;
+	}
+	public void setSecret(String secret) {
+		this.secret = secret;
+	}
+	public String getRealName() {
+		return realName;
+	}
+	public void setRealName(String realName) {
+		this.realName = realName;
+	}
+	public Date getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(Date regDate) {
+		this.regDate = regDate;
+	}
+	public String getLoginIP() {
+		return loginIP;
+	}
+	public void setLoginIP(String loginIP) {
+		this.loginIP = loginIP;
+	}
+	public Date getLoginDate() {
+		return loginDate;
+	}
+	public void setLoginDate(Date loginDate) {
+		this.loginDate = loginDate;
+	}
+	
+	@Override
+	public String toString() {
+		return "UserVo [id=" + id + ", loginName=" + loginName + ", password=" + password + ", delFlag=" + delFlag
+				+ ", locked=" + locked + ", organizationID=" + organizationID + ", unitID=" + unitID + ", email="
+				+ email + ", phone=" + phone + ", mobile=" + mobile + ", userType=" + userType + ", duty=" + duty
+				+ ", job=" + job + ", secret=" + secret + ", realName=" + realName + ", regDate=" + regDate
+				+ ", loginIP=" + loginIP + ", loginDate=" + loginDate + "]";
+	}
+	
+	
+	
+}

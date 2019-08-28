@@ -1,0 +1,10 @@
+UserVo.username = user name can't be null
+UserVo.password = password can't be null
+UserVo.username.length = login name should between 6 20
+UserVo.password.length = login password should between 6 20 
+
+Login.success = success
+Login.locked = login name is locked
+Login.name = login name error
+Login.password = password error
+Login.exception = unknown exception

@@ -1,0 +1,66 @@
+$(function(){
+	init();
+})
+var height;//iframe高
+var width;//iframe宽
+function init(){
+	var main_window = $("#main_window");	
+	height = $(window).height()-200;
+	width= main_window[0].clientWidth-55;
+	showContent('user_list','user/userList.html');//显示主页 欢迎页
+	$.ajax({
+		url:"../web/get_loginInfo.do",
+		type:"post",
+		dataType:"json",
+		success:function(data){			
+				$("#login_user").text(data.loginName);						
+		}
+	});
+}
+/* 动态设置frame的宽高 */
+$(window).resize(function(){
+	var main_window = $("#main_window");	
+	height = $(window).height()-200;
+	width= main_window[0].clientWidth-55;
+	$("iframe").each(function(){
+		$(this).width(width+"px");
+		$(this).height(height+"px");
+	});
+}); 
+/*选中页签*/
+function choose(obj){
+	$("#option_items li div").each(function(){
+		if(  $(this)[0].children[0] === obj ){			
+			$(this).addClass("active");
+		}else{
+			$(this).removeClass("active");
+		}	
+	});
+}
+/*显示内容*/
+function showContent(id,src){	
+	if(!$("#"+id).attr("src")){
+		$("#main_window").append(
+				"<div class=\"col-sm-4\" id=\"h\">"+
+				"    <iframe id = \""+id+"\" name = \""+id+"\"  src=\""+src+"\" style=\"overflow:yes;\" scrolling=\"auto\" frameborder=\"0\" width=\""+width+"\" height=\""+height+"\" ></iframe>"+
+				"</div>	"
+				);
+	}
+	$("iframe").each(function(){	//先隐藏所有的iframe	
+		$(this).hide();
+	});
+	$("#"+id).show();//显示当前窗口
+}
+/*退出登录*/
+function login_out(){
+	$.ajax({
+		url:"../web/login_out.do",
+		type:"get",
+		dataType:"json",
+		success:function(data){			
+				if( data.state == 1 ){
+					window.location.href="login.html";
+				}					
+		}		
+	});
+}

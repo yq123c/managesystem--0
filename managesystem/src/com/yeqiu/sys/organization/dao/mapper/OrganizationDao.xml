@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+	<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" 
+		"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.yeqiu.sys.organization.dao.OrganizationDao">
+<!--  根据id获取此id的下级机构信息 -->
+<!-- public List<Map<String,Object>> getUnitInfoById(String id) -->
+<select id="getUnitInfoById" resultType="map" parameterType="String">
+select t.id,
+       t.parent_id,
+       t.parent_ids,
+       t.name,
+       t.org_code,
+			 t.org_type,
+       (select count(o.id) from t_sys_organization o where o.parent_id=t.id)isParent   
+  from t_sys_organization t
+ where t.parent_id = #{id,jdbcType=VARCHAR}
+</select>
+<select id="getNameById" resultType="String" parameterType="String">
+	SELECT 
+		NAME 
+	FROM 
+		sys_organization
+	WHERE   
+		ID=#{id,jdbcType=VARCHAR}
+</select>
+<!--根据机构的id删除该机构  -->
+<!-- public Integer deleteUnitById(String id) -->
+<delete id="deleteUnitById" parameterType="String">
+delete from 
+	t_sys_organization 
+where 
+	id=#{id,jdbcType=VARCHAR}
+</delete>
+<!-- 添加一个新的机构 -->
+<!-- public Integer addUnit(@Param("dutyInfo") Map<String,String> dutyInfo) -->
+<insert id="addUnit" parameterType="map">
+	insert into
+		t_sys_organization (
+			id,
+			parent_id,
+			parent_ids,
+			name,		
+			org_code,
+			org_type,			
+			create_person,
+			create_person_id,
+			create_time,
+			modify_time
+		)values(
+			#{dutyInfo.id,jdbcType=VARCHAR},
+			#{dutyInfo.parent_id,jdbcType=VARCHAR},
+			#{dutyInfo.parent_ids,jdbcType=VARCHAR},
+			#{dutyInfo.name,jdbcType=VARCHAR},
+			#{dutyInfo.org_code,jdbcType=VARCHAR},
+			#{dutyInfo.org_type,jdbcType=VARCHAR},			
+			#{dutyInfo.create_person,jdbcType=VARCHAR},
+			#{dutyInfo.create_person_id,jdbcType=VARCHAR},
+			now(),
+			now()
+	)
+</insert>
+</mapper>

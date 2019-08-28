@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<title>主页</title>
+<meta charset="utf-8">
+<!-- 移动设备优先 -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="../../resources/js/bootstrap/css/bootstrap.css"/>
+<link rel="stylesheet" type="text/css" href="../../resources/js/bootstrap/css/bootstrap-theme.min.css"/>
+
+<link rel="stylesheet" type="text/css" href="../../resources/js/layer-v3.0.1/skin/default/layer.css"/>
+<link rel="stylesheet" href="../../resources/font-awesome-4.7.0/css/font-awesome.css">
+
+<script type="text/javascript" src="../../resources/js/jquery/jquery-3.4.0.min.js"></script>
+
+<script type="text/javascript" src="../../resources/js/bootstrap/js/popper.min.js"></script>
+<script type="text/javascript" src="../../resources/js/bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript" src="../../resources/js/layer-v3.0.1/layer.js"></script>
+<script type="text/javascript" src="../../js/util/common_util.js"></script>
+<script type="text/javascript">
+$(function(){
+	/*默认初始化北京市的地址信息*/
+	get_addressInfo("province",1);
+	get_addressInfo("city",110000);
+	get_addressInfo("area",110001);
+});
+/*address 父id
+ * select_id 下拉选id
+ */
+function get_addressInfo(select_id,parent_id){
+	$.ajax({
+		url:"../user/address.do",
+		type:"get",
+		dataType:"json",
+		data:{parent_id:parent_id},
+		success:function(data){
+			var option = "<option value='0' selected='selected'>---- 请选择 ----</option>";
+			if( data ){		
+				for( var i=0;i<data.length;i++){
+					var o = "<option value='"+data[i].id+"'>"+data[i].name+"</option>";
+					option = option + o;
+				}
+			}
+			$("#"+select_id).append(option);
+		},
+		error:function(e){
+			console.log("获取不到parent_id");
+		}
+	});
+}
+/*改变下级地址的信息
+ * next_id 下级地址地址select的id
+ * current_id 当前地址select的id
+ */
+
+function change_addressInfo(next_id,current_id){	
+	$("#"+next_id+" option").remove();
+	get_addressInfo(next_id,$("#"+current_id+" option:selected").val());
+}
+/*密码确认校验*/
+function p_confirm(obj){
+	var password = $("input[name=password]").val();
+	var re_password = $(obj);
+	if(password != re_password.val()){
+		$("#p_confirm").show();
+		$("#p_confirm").addClass("not_null");
+		re_password.focus();
+	}else{
+		$("#p_confirm").hide();
+	}
+}
+/*表单提交*/
+function form_submit(){
+	var form = $("#form");
+	var form_data = serializeToJSON(form);
+	form_data.province = "";
+	form_data.city = "";
+	form_data.area = "";
+	form_data.operation = "add";//操作标识
+	if( $("#province option:selected").val() != "0" ){
+		form_data.province = $("#province option:selected").text();
+	}
+	if( $("#city option:selected").val() != "0" ){
+		form_data.city = $("#city option:selected").text();
+	}
+	if( $("#area option:selected").val() != "0" ){
+		form_data.area = $("#area option:selected").text();
+	}
+	$.ajax({
+		url:"../user/add.do",
+		type:"post",
+		data:JSON.stringify(form_data),
+		dataType:"json",
+		contentType:"application/json;charset=utf-8",
+		beforeSend:function(){
+			if(!$("#user_name").val()){				
+				return false;
+			}else if(!$("#login_name").val()){			
+				return false;
+			}else if(!$("#password").val()){
+				return false;
+			}else if(!$("#re_password").val()){
+				return false;
+			}			
+		},
+		success:function(data){
+			if( data.state == 1 ){
+				 layer.msg(data.messages, {
+					  icon: 1,
+					  offset: '188px',
+					  shade:0.3,
+					  btn:['确定'],
+					  yes:function(){
+						  window.location.reload();
+						  layer.close(layer.index);
+					  }
+					});
+			}else{
+				 layer.msg(data.messages, {
+					  icon: 2,
+					  offset: '188px',
+					  shade:0.3,
+					  btn:['确定'],
+					  yes:function(){						
+						  layer.close(layer.index);
+					  }
+				});
+			}
+		},
+		error:function(e){
+			console.log("出错了"+e);
+		}
+	});
+}
+</script>
+<style type="text/css">
+#tbl_user > thead th {
+      padding: 0;
+      margin: 0;
+      background-color: #d9edf7;
+      text-align: center;
+}
+ #tbl_user tbody > tr:hover {
+       background-color: #b2b4b5;    
+}
+ #tbl_user tbody > tr{
+ 	text-align: center;
+ }
+.text_bg{
+	background-color: #3fa255;
+	color: white;
+	width:76px;
+}
+.d-border{
+	border-radius: 30px;
+	width: 90px;
+	
+}
+.top{
+	margin-top: 8px;
+}
+.m-top{
+	margin-top: 32px;
+}
+.not_null{
+	color: red;
+	margin-left: 1px;
+}
+</style>
+</head>
+<body>
+	<div class="container mt-3 text-center">  	  	    
+	  <form id="form" onsubmit="return false">
+	  	<h2>基本信息</h2>
+	  	<div class="row justify-content-center">	  		
+	  		<div class="input-group col-sm-4">
+		      <div class="input-group-prepend">
+		        <span class="input-group-text text_bg d-border">名&nbsp;&nbsp;&nbsp;&nbsp;字<span class="not_null">*</span></span>
+		      </div>
+		      <input type="text" class="form-control d-border  border-warning" required="required" id="user_name" name="user_name"placeholder="请输入用户名字">
+		    </div>  
+		    <div class="input-group col-sm-4 ">
+		      <div class="input-group-prepend">
+		        <span class="input-group-text text_bg d-border">登录名<span class="not_null">*</span></span>
+		      </div>
+		      <input type="text" class="form-control d-border border-warning" required="required" id="login_name" name ="login_name" placeholder="请输入登录名">
+		    </div>		   
+	  	</div>
+	    <div class="row top justify-content-center">	    
+	  		<div class="input-group col-sm-4">
+		      <div class="input-group-prepend">
+		        <span class="input-group-text text_bg d-border">密&nbsp;&nbsp;&nbsp;&nbsp;码</span>
+		      </div>
+		      <input type="password" autocomplete="off" class="form-control d-border border-warning" required="required" id="password" name="password"placeholder="密码">
+		    </div>  
+		    <div class="input-group col-sm-4 ">
+		      <div class="input-group-prepend">
+		        <span class="input-group-text text_bg d-border">确认密码<span id="p_confirm" style="display: none;" >*</span></span>
+		      </div>		      
+		      <input type="password"  autocomplete="on" class="form-control d-border border-warning" required="required" onkeyup="p_confirm(this)"id="re_password" name="re_password"placeholder="确认密码">		   	 
+			</div>			
+	  	</div>
+	  	<h2 class="m-top">地址信息</h2>
+	  	<div class="row justify-content-center">
+	  		<div class="input-group col-sm-4">
+		      <div class="input-group-prepend">
+		        <span class="input-group-text text_bg d-border" >省&nbsp;&nbsp;&nbsp;&nbsp;份</span>
+		      </div>		      
+		      <select class="form-control d-border border-warning" id="province" onchange="change_addressInfo('city',this.id)">
+		      </select>   
+		    </div> 
+	  		<div class="input-group col-sm-4">
+		      <div class="input-group-prepend">
+		        <span class="input-group-text text_bg d-border">城&nbsp;&nbsp;&nbsp;&nbsp;市</span>
+		      </div>		      
+		      <select class="form-control d-border border-warning" id="city" onchange="change_addressInfo('area',this.id)">
+		      </select>   
+		    </div>	    	  		
+	  	</div>
+	  	<div class="row top justify-content-center">
+	  		<div class="input-group col-sm-4">
+		      <div class="input-group-prepend">
+		        <span class="input-group-text text_bg d-border">县&nbsp;&nbsp;&nbsp;&nbsp;区</span>
+		      </div>		      
+		      <select class="form-control d-border border-warning" id="area" >
+		      </select>   
+		    </div> 
+	  		<div class="input-group col-sm-4">
+		      <div class="input-group-prepend">
+		        <span class="input-group-text text_bg d-border">详细地址</span>
+		      </div>		      
+		      <input type="text" class="form-control d-border border-warning" name="address"placeholder="详细地址">
+		    </div> 		    	  		
+	  	</div>
+	  		<h2 class="m-top">机构信息</h2>
+	  	<div class="row justify-content-center">
+	  		<div class="input-group col-sm-4">
+		      <div class="input-group-prepend">
+		        <span class="input-group-text text_bg d-border">单位/部门</span>
+		      </div>
+		      <input type="text" class="form-control d-border border-warning" name="organization" placeholder="选择单位/部门">
+		    </div>  		    
+	  	</div>
+	  	<h2 class="m-top">其它信息</h2>
+	  	<div class="row justify-content-center">
+	  		<div class="input-group col-sm-4">
+		      <div class="input-group-prepend">
+		        <span class="input-group-text text_bg d-border">联系方式</span>
+		      </div>
+		      <input type="text" class="form-control d-border border-warning" name="phone" placeholder="电话/手机">
+		    </div>  
+		    <div class="input-group col-sm-4 ">
+		      <div class="input-group-prepend">
+		        <span class="input-group-text text_bg d-border">邮箱</span>
+		      </div>
+		      <input type="text" class="form-control d-border border-warning" name="email"placeholder="邮箱">
+		    </div>
+	  	</div>
+	  	<div class="row justify-content-center m-top">
+	  		<button type="submit" class="btn btn-success btn-block col-sm-4 d-border" onclick="form_submit()">确认提交</button>
+	  	</div>
+	  </form>	  
+	</div>
+</body>
+</html>

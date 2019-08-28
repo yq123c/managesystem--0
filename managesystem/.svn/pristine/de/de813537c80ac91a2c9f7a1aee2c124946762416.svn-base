@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>组织机构信息</title>
+<!-- 移动设备优先 -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript" src="../../resources/js/jquery/jquery-3.4.0.min.js"></script>
+<link rel="stylesheet" href="../../resources/js/ztree/zTreeStyle.css" type="text/css">
+<link rel="stylesheet" href="../../css/unit-info/unitInfo.css" type="text/css">
+<link rel="stylesheet" href="../../resources/js/ztree/ztree.css" type="text/css">
+<script type="text/javascript" src="../../resources/js/ztree/jquery.ztree.all-3.5.js"></script>
+
+<link rel="stylesheet" href="../../resources/js/bootstrap/css/bootstrap.min.css">
+<!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+<script src="../../resources/js/bootstrap/js/bootstrap.min.js"></script>
+<script src="../../js/util/common_util.js"></script>
+<script src="../../js/unit/unit_info.js"></script>
+<style type="text/css">
+	DIV #ztree{
+		position: relative;
+		float: left;
+	}
+	DIV #content_show{
+		position: relative;
+		float: right;
+	}
+</style>
+</head>
+<body>
+		<div class="container-fluid" style="margin-top: 30px">
+		<div class="row">
+			<!--左侧导航  -->
+			<nav class="col-md-2 d-none d-md-block bg-light sidebar" id="nav_left" >				
+				<div style="margin: 150 auto">
+					<ul class="ztree" id="ztree"></ul>
+				</div>			  
+			</nav>
+			<main id ="main_window" role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">							
+					<div class="table-responsive">
+						<table class="table table-hover " id="table-bordered">
+						<caption></caption>
+						<thead>
+							<tr>
+								<th>单位名</th>
+								<th>上级单位</th>
+								<th>机构类型</th>
+								<th>单位地址</th>
+								<th>联系电话</th>							
+							</tr>
+						</thead>
+						<tbody>
+							<tr>			
+								<td id="unit_name"></td>
+								<td id="up_unit_name"></td>
+								<td id="unit_type"></td>
+								<td id="unit_address"></td>
+								<td id="unit_phone"></td>
+								<!-- <td>
+									<div class="btn-group btn-group-sm">
+										<button type="button" class="btn btn-default"><a href="##" onclick="modifyTree()">编辑</a> </button>
+										<button type="button" class="btn btn-default"><a href="##" onclick="removeTreeNode()">删除</a></button>
+									</div>
+								</td> -->
+							</tr>		
+						</tbody>
+					</table>
+					</div>						
+					<!-- <div id="edit" class="">
+						<form action="" method="post">	
+							<div class="form-inline">
+					  			<label class="lable-group">归属单位:</label>
+					  			<div><input class="form-control" type="text" name="unitID"></div>
+					  		</div>	
+					  		<div class="form-inline">
+					  			<input class="form-control" type="submit" value="确定">
+					  		</div>	
+			  			</form>		  							  							  	
+					</div>		 -->				
+			</main>
+		</div>
+	</div>
+	<div id="page_bg"></div>
+	<div id="rMenu">
+		<ul>
+			<li id="m_add" onclick="addTreeNode();">添加下级</li>
+			<li id="m_del" onclick="removeTreeNode();">删除本级</li>
+			<li id="m_modify" onclick="modifyTree();">修改信息</li>
+		</ul>
+	</div>
+	<div id="add_Menu">
+		<form id="form_add_unit"action="">
+			<table class="hovertable">
+			<tr onmouseover="this.style.backgroundColor='#D3D8D8';"
+				onmouseout="this.style.backgroundColor='#d4e3e5';">
+				<td>上级单位<span style="color: red;">*</span></td>
+				<td><input type="text" class="must_add" id="up_duty_name" name="up_duty_name" placeholder="请输入"> </td>
+			</tr>
+			<tr onmouseover="this.style.backgroundColor='#D3D8D8';"
+				onmouseout="this.style.backgroundColor='#d4e3e5';">
+				<td>单位名称<span style="color: red;">*</span></td>
+				<td><input type="text" class="must_add" id="name" name="name"  placeholder="请输入"> </td>
+			</tr>
+			<tr onmouseover="this.style.backgroundColor='#D3D8D8';"
+				onmouseout="this.style.backgroundColor='#d4e3e5';">
+				<td>序号<span style="color: red;">*</span></td>
+				<td><input type="text" class="must_add" id="sort" name="sort"  placeholder="请输入"> </td>
+			</tr>
+			<tr onmouseover="this.style.backgroundColor='#D3D8D8';"
+				onmouseout="this.style.backgroundColor='#d4e3e5';">
+				<td>区域<span style="color: red;">*</span></td>
+				<td><input type="text" class="must_add"  id="area_id" name="area_id"  placeholder="请输入"> </td>
+			</tr>
+			<tr onmouseover="this.style.backgroundColor='#D3D8D8';"
+				onmouseout="this.style.backgroundColor='#d4e3e5';">
+				<td>编码<span style="color: red;">*</span></td>
+				<td><input type="text" class="must_add" id="code" name="code"  placeholder="请输入"> </td>
+			</tr>
+			<tr onmouseover="this.style.backgroundColor='#D3D8D8';"
+				onmouseout="this.style.backgroundColor='#d4e3e5';">
+				<td>类型<span style="color: red;">*</span></td>
+				<td><input type="text" class="must_add" id="type" name="type"  placeholder="请输入"> </td>
+			</tr>
+			<tr onmouseover="this.style.backgroundColor='#D3D8D8';"
+				onmouseout="this.style.backgroundColor='#d4e3e5';">
+				<td>详细地址</td>
+				<td><input type="text" id="address" name="address"  placeholder="请输入"> </td>
+			</tr>
+			<tr onmouseover="this.style.backgroundColor='#D3D8D8';"
+				onmouseout="this.style.backgroundColor='#d4e3e5';">
+				<td>邮编</td>
+				<td><input type="text" id="post_code" name="post_code"  placeholder="请输入"> </td>
+			</tr>
+			<tr onmouseover="this.style.backgroundColor='#D3D8D8';"
+				onmouseout="this.style.backgroundColor='#d4e3e5';">
+				<td>电话</td>
+				<td><input type="text" class="must_add" id="phone" name="phone"  placeholder="请输入"> </td>
+			</tr>
+			<tr onmouseover="this.style.backgroundColor='#D3D8D8';"
+				onmouseout="this.style.backgroundColor='#d4e3e5';" style="text-align: center;">
+				<td colspan="2"><input type="button"  onclick="sumitAddInfo()" value="确认添加"> <input type="button" onclick="closeAddMenu()" value="取消"></td>
+			</tr>
+		</table>
+		</form>
+	</div>
+</body>
+</html>

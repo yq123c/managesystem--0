@@ -1,0 +1,59 @@
+log4j.rootLogger=DEBUG,stdout,host
+#Control Infomation
+log4j.appender.stdout.threshold=DEBUG
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%d [%-5p] %c:%L - %m%n
+#key infomation
+log4j.appender.host.threshold=DEBUG
+log4j.appender.host=org.apache.log4j.DailyRollingFileAppender
+log4j.appender.host.file=d:/sysbase/loginfo
+log4j.appender.host.datePattern=yyyyMMdd'.txt'
+log4j.appender.host.layout=org.apache.log4j.PatternLayout
+#log4j.appender.host.layout.ConversionPattern=%d [%-5p] %c:%L - %m%n
+log4j.appender.host.layout.ConversionPattern=%n-------------------------------------------------------------%n%-d{yyyy-MM-dd HH\:mm\:ss} %m%n
+
+log4j.logger.ognl=WARN
+log4j.logger.org.acegi=WARN
+log4j.logger.com.mchange.v2=OFF
+#CXF
+log4j.logger.org.apache.cxf=WARN
+log4j.logger.org.apache.cxf.interceptor.AbstractLoggingInterceptor=WARN
+log4j.logger.org.apache.shiro.cache.ehcache.EhCacheManager=WARN
+log4j.logger.java.sql=WARN
+#Mybatis
+log4j.logger.org.mybatis.spring=ERROR
+log4j.logger.org.apache.ibatis=ERROR
+log4j.logger.org.hibernate.validator=INFO
+#Spring
+log4j.logger.org.springframework=WARN
+log4j.logger.org.springframework.orm=WARN
+log4j.logger.org.springframework.orm.hibernate4=WARN
+log4j.logger.org.springframework.web=WARN
+log4j.logger.org.springframework.web.servlet.view=WARN
+#Shiro
+log4j.logger.org.apache.shiro=INFO
+log4j.logger.org.apache.shiro.session.mgt.AbstractValidatingSessionManager=WARN
+#Ehcache
+log4j.logger.net.sf.ehcache=INFO
+#Apache common
+log4j.logger.org.apache.commons=WARN
+log4j.logger.org.apache.commons.httpclient=WARN
+#JSON LOG
+log4j.logger.com.google.common=WARN
+log4j.logger.net.sf.json=WARN
+log4j.logger.com.googlecode.jsonplugin=WARN
+#Druid
+log4j.logger.com.alibaba.druid=WARN
+#Freemarker
+log4j.logger.freemarker=WARN
+log4j.logger.org.apache.http.wire=INFO
+log4j.logger.org.apache.http=INFO
+log4j.logger.httpclient.wire=INFO
+log4j.logger.org.objectweb=INFO
+#HudiPlatformLogs
+log4j.logger.com.aisino.platform=INFO
+log4j.logger.org.reflections=INFO
+log4j.logger.com.huadi.sys.security.shiro.session.CacheSessionDAO=INFO
+##\u89E3\u9664\u7C7Borg.apache.jasper.compiler.TldLocationsCache\u7684log  
+org.apache.jasper.compiler.TldLocationsCache.level = FINE  

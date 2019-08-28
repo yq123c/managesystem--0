@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+	<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" 
+		"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.five.managesystem.user.dao.UserDao">
+
+<sql id="userColumnList">
+	ID,LOGIN_NAME,PASSWORD,DEL_FLAG,REG_DATE,ORGANIZATION_ID,DEPT_ID,EMAIL,PHONE,
+	MOBILE,DUTY,JOB,SECRET,REAL_NAME,LOGIN_IP,LOGIN_DATE,LOCKED,USER_TYPE
+</sql>
+
+<!-- 按用户名查询 -->
+<select id="findByUsername" resultType="java.util.Map" parameterType="java.lang.String">
+	SELECT 
+		<include refid="userColumnList"/> 
+	FROM 
+		SYS_USERS 
+	WHERE 
+		LOGIN_NAME = #{loginName,jdbcType=VARCHAR}
+	AND 
+		DEL_FLAG = '0'
+</select>
+
+<!-- 按用户ID查询 -->
+<select id="findById" resultMap="userResultMap" parameterType="java.lang.String">
+	SELECT 
+		<include refid="userColumnList"/> 
+	FROM 
+		SYS_USERS 
+	WHERE 
+		ID = #{id,jdbcType=VARCHAR}
+	AND 
+		DEL_FLAG = '0'
+</select>
+
+<!-- 查询总记录数 -->
+<select id="findTotalUsers" resultType="java.lang.Integer" parameterType="PagingVo">
+	SELECT
+		count(1) total
+	FROM
+		SYS_USERS 
+          <where>
+          		DEL_FLAG = '0'
+          		<if test="loginName != null and loginName !='' ">AND LOGIN_NAME like '%'|| #{loginName,jdbcType=VARCHAR} || '%'</if>
+          		<if test="userType != null and userType !='' "> AND USER_TYPE = #{userType,jdbcType=VARCHAR}</if>
+          </where>
+</select>
+
+<!-- 查询用户 -->
+<select id="findUser" resultMap="userResultMap" parameterType="PagingVo">
+	SELECT * FROM ( 
+      SELECT A.*,ROWNUM RN 
+      FROM (
+           SELECT <include refid="userColumnList"/>  FROM SYS_USERS  
+           <where>
+           		DEL_FLAG = '0'
+           		<if test="loginName != null and loginName !='' ">AND LOGIN_NAME like '%'|| #{loginName,jdbcType=VARCHAR} || '%'</if>
+           		<if test="userType != null and userType !='' "> AND USER_TYPE = #{userType,jdbcType=VARCHAR}</if>
+           </where>
+           	<if test="sort != null">  
+    			ORDER BY ${sort}
+    			<if test="sortOrder != null ">${sortOrder}</if>
+    		</if>
+        ) A 
+    WHERE ROWNUM 
+    	&lt;= #{limit,jdbcType=NUMERIC}
+	) 
+	WHERE RN 
+		&gt; #{offset,jdbcType=NUMERIC}
+</select>
+
+<select id="findLabelByValue" resultType="java.lang.String" parameterType="java.lang.String">
+	SELECT LABEL FROM SYS_DICT WHERE #{value,jdbcType=VARCHAR} = VALUE
+</select>
+
+<resultMap type="java.util.Map" id="userResultMap">
+	<id column="ID" property="ID"/>
+	<association  column="USER_TYPE" property="USER_LABEL" select="findLabelByValue" javaType="java.lang.String"/>
+	<association  column="ORGANIZATION_ID" property="ORGANIZATION_NAME" 
+	select="com.five.managesystem.organization.dao.OrganizationDao.getNameById" javaType="java.lang.String"/>
+	<association  column="DEPT_ID" property="DEPT_NAME" 
+	select="com.five.managesystem.organization.dao.OrganizationDao.getNameById" javaType="java.lang.String"/>
+	<collection property="ROLES" column="ID" select="com.five.managesystem.permission.dao.RoleDao.findRolesByUserId" javaType="java.util.List"></collection>
+</resultMap>
+
+<!-- 按ID删除用户 -->
+<update id="deleteById" parameterType="java.lang.String">
+  UPDATE 
+  	SYS_USERS 
+  <set>
+      DEL_FLAG = '1',
+  </set>
+  WHERE 
+  	ID = #{id,jdbcType=VARCHAR}
+</update>
+
+<!-- 按ID更新用户 -->
+<update id="updateUserById" parameterType="com.five.managesystem.user.entity.UserVo">
+  UPDATE
+  	SYS_USERS
+	  <set>
+	     <if test="loginName != null"> LOGIN_NAME =  #{loginName,jdbcType=VARCHAR},</if>
+	     <if test="password != null"> PASSWORD =  #{password,jdbcType=VARCHAR},</if>
+	     <if test="locked != null"> LOCKED =  #{locked,jdbcType=VARCHAR},</if>
+	     <if test="organizationID != null">  ORGANIZATION_ID =  #{organizationID,jdbcType=VARCHAR},</if>
+	     <if test="deptID != null">  DEPT_ID =  #{deptID,jdbcType=VARCHAR},</if>
+	     <if test="email != null">  EMAIL =  #{email,jdbcType=VARCHAR},</if>
+	     <if test="phone != null">  PHONE =  #{phone,jdbcType=VARCHAR},</if>
+	     <if test="mobile != null">  MOBILE =  #{mobile,jdbcType=VARCHAR},</if>
+	     <if test="userType != null">  USER_TYPE =  #{userType,jdbcType=VARCHAR},</if>
+	     <if test="duty != null">  DUTY =  #{duty,jdbcType=VARCHAR},</if>
+	     <if test="job != null">  JOB =  #{job,jdbcType=VARCHAR},</if>
+	     <if test="secret != null">  SECRET =  #{secret,jdbcType=VARCHAR},</if>
+	     <if test="realName != null">  REAL_NAME =  #{realName,jdbcType=VARCHAR},</if>
+	     <if test="loginIP != null">  LOGIN_IP =  #{loginIP,jdbcType=VARCHAR},</if>
+	     <if test="loginDate != null">  LOGIN_DATE =  SYSDATE,</if>
+	     <if test="lastIP != null">  LAST_IP =  #{lastIP,jdbcType=VARCHAR},</if>
+	     <if test="lastDate != null">  LAST_DATE =  #{lastDate,jdbcType=TIMESTAMP},</if>
+	  </set>
+  WHERE
+  	ID = #{id,jdbcType=VARCHAR}
+</update>
+
+<!-- 添加用户 -->
+<insert id="addUser" parameterType="com.five.managesystem.user.entity.UserVo">
+	INSERT INTO
+		SYS_USERS
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+	        ID,LOGIN_NAME,PASSWORD,DEL_FLAG,LOCKED,REG_DATE,
+	      <if test="user.organizationID != null"> ORGANIZATION_ID,</if>
+	      <if test="user.deptID != null">DEPT_ID,</if>
+	      <if test="user.email != null">EMAIL,</if>
+	      <if test="user.phone != null">PHONE,</if>
+	      <if test="user.mobile != null">MOBILE,</if>
+	      	USER_TYPE,
+	      <if test="user.duty != null">DUTY,</if>
+	      <if test="user.job != null">JOB,</if>
+	      <if test="user.secret != null">SECRET,</if>
+	      <if test="user.realName != null">REAL_NAME,</if>
+	      <if test="user.loginIP != null">LOGIN_IP,</if>
+	      <if test="user.loginDate != null">LOGIN_DATE,</if>
+	    </trim>
+	VALUES
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			#{user.id,jdbcType=VARCHAR},
+		    #{user.loginName,jdbcType=VARCHAR},
+			#{user.password,jdbcType=VARCHAR},
+			'0',
+			#{user.locked,jdbcType=VARCHAR},
+			SYSDATE,
+		  <if test="user.organizationID != null">
+       		#{user.organizationID,jdbcType=VARCHAR},
+		  </if>
+	      <if test="user.deptID != null">
+	      	#{user.deptID,jdbcType=VARCHAR},
+	      </if>
+	      <if test="user.email != null">
+	        #{user.email,jdbcType=VARCHAR},
+	      </if>
+	      <if test="user.phone != null">
+	        #{user.phone,jdbcType=VARCHAR},
+	      </if>
+	      <if test="user.mobile != null">
+	        #{user.mobile,jdbcType=VARCHAR},
+	      </if>
+	      	#{user.userType,jdbcType=VARCHAR},
+	      <if test="user.duty != null">
+	        #{user.duty,jdbcType=VARCHAR},
+	      </if>
+	      <if test="user.job != null">
+	        #{user.job,jdbcType=VARCHAR},
+	      </if>
+	      <if test="user.secret != null">
+	        #{user.secret,jdbcType=VARCHAR},
+	      </if>
+	      <if test="user.realName != null">
+	       	#{user.realName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="user.loginIP != null">
+	        #{user.loginIP,jdbcType=VARCHAR},
+	      </if>
+	      <if test="user.loginDate != null">
+	        #{user.loginDate,jdbcType=DATE},
+	      </if>
+		</trim>
+</insert>
+
+<!-- 查用户 类型-->
+<select id="findUserType" resultType="java.util.Map">
+	SELECT 
+		VALUE,LABEL 
+	FROM 
+		SYS_DICT 
+	WHERE 
+		TYPE='sys_user_type' 
+	ORDER BY 
+		VALUE
+</select>
+
+<!-- 通过登录名查找用户角色 -->
+<!--  List<Map<String,String>> findRoles(String username)-->
+<select id="findRoles" resultType="map">
+select 
+  sr.id roleid,
+  sr.name rolename,
+  sr.description 
+from 
+  sys_users t 
+  inner join sys_user_role sur on t.id= sur.user_id
+  left join sys_role sr on sur.role_id = sr.id
+where 
+  t.login_name=#{username,jdbcType=VARCHAR}
+</select>
+<!-- 通过角色id查找用户权限 -->
+<!-- List<Map<String,String>> findPermissions(String roleId) -->
+<select id="findPermissions" resultType="map">
+select 
+  o.permission 
+from 
+  sys_role_opration t
+  inner join sys_operation o on t.operation_id=o.id
+where
+  t.role_id=#{roleId,jdbcType=VARCHAR}
+</select>
+<!-- 根据用户id获取用户的角色id列表 -->
+<!--  public Set<String> getRolesByUserId(String id) -->
+<select id="getRolesByUserId" resultType="String">
+select 
+	t.role_id 
+from 
+	sys_user_role t 
+where 
+	t.user_id =#{id,jdbcType=VARCHAR}
+</select>
+<!--  添加用户角色信息 -->
+<!-- public Integer addUserRoleInfo(String userId,String roleId) -->
+<insert id="addUserRoleInfo">
+insert into 
+	sys_user_role 
+values(
+	#{userId,jdbcType=VARCHAR},
+	#{roleId,jdbcType=VARCHAR}
+)
+</insert>
+<!--  删除用户角色信息 -->
+<!--  public Integer deleteUserRoleInfo(String userId,String roleId) -->
+<delete id="deleteUserRoleInfo">
+delete from sys_user_role t
+where 
+	t.user_id=#{userId,jdbcType=VARCHAR}
+	and
+	t.role_id=#{roleId,jdbcType=VARCHAR}
+</delete>
+</mapper>

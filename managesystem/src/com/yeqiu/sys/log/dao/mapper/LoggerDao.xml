@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+	<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" 
+		"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.five.managesystem.log.dao.LoggerDao">
+<!--  保存日志 -->
+<!-- public Integer saveLog(Map<String,Object> logInfo) -->
+<insert id="saveLog" parameterType="map">
+INSERT INTO sys_log
+VALUES(
+	#{logInfo.id,jdbcType=VARCHAR},
+	#{logInfo.methodName,jdbcType=VARCHAR},
+	#{logInfo.operationType,jdbcType=VARCHAR},
+	#{logInfo.operationName,jdbcType=VARCHAR},
+	#{logInfo.requestIp,jdbcType=VARCHAR},
+	#{logInfo.requestDevice,jdbcType=VARCHAR},
+	#{logInfo.parameter,jdbcType=VARCHAR},
+	#{logInfo.exception,jdbcType=VARCHAR},
+	#{logInfo.createPerson,jdbcType=VARCHAR},
+	#{logInfo.createPersonId,jdbcType=VARCHAR},
+	now()
+)
+</insert>
+</mapper>

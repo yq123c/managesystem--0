@@ -1,0 +1,27 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>角色列表信息</title>
+<link rel="stylesheet" type="text/css" href="../../resources/js/bootstrap/css/bootstrap.css"/>
+<link rel="stylesheet" type="text/css" href="../../resources/js/bootstrap/bootstrapTable/css/bootstrap-table.min.css"/>
+<link rel="stylesheet" type="text/css" href="../../resources/js/layer-v3.0.1/skin/default/layer.css"/>
+
+<script type="text/javascript" src="../../resources/js/jquery/jquery-3.4.0.min.js"></script>
+
+<script type="text/javascript" src="../../resources/js/bootstrap/js/popper.min.js"></script>
+<script type="text/javascript" src="../../resources/js/bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript" src="../../resources/js/bootstrap/bootstrapTable/bootstrap-table.min.js"></script>
+<script type="text/javascript" src="../../resources/js/bootstrap/bootstrapTable/locale/bootstrap-table-zh-CN.js"></script>
+<script type="text/javascript" src="../../resources/js/layer-v3.0.1/layer.js"></script>
+<script src="../../js/util/common_util.js"></script>
+<script src="../../js/role/role_list.js"></script>
+</head>
+<body>
+<div class="table-div" id="table-div">
+	<table id="roleList-table"  data-height="652">
+	</table>
+</div>
+</body>
+</html>
