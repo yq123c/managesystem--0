@@ -49,7 +49,7 @@ public class OrganizationController {
 			returnResult = new ResponseResult(ResponseResult.STATE_FAIL,"对不起，您无此操作权限");
 		}catch (Exception e) {
 			e.printStackTrace();
-			returnResult = new ResponseResult(ResponseResult.STATE_FAIL,"服务器除了点差错！！");
+			returnResult = new ResponseResult(ResponseResult.STATE_FAIL,"服务器出了点差错！！");
 		}
 		return returnResult;	
 	}

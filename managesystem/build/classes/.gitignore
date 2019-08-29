@@ -1,10 +1,1 @@
 /com/
-/db.properties
-/ehcache.xml
-/log4j.properties
-/mybatis-config.xml
-/spring_dao.xml
-/spring_mvc.xml
-/spring_service.xml
-/spring_shiro-web.xml
-/web_service.xml

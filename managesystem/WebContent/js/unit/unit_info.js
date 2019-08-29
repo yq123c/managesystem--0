@@ -33,8 +33,7 @@ $(function(){
 			    },			
 			    callback:{//事件处理函数
 			    	onAsyncSuccess:asyncSuccess,
-			    	onClick:onClick,//单击
-			        onRightClick:OnRightClick
+			    	onClick:onClick,//单击			    
 			    }
 			}
 	var zTree, rMenu,add_Menu;
@@ -156,6 +155,9 @@ $(function(){
 			var parent_ids = $(this).closest("tr").data("parent-ids");   
 			$("#parent_id").val(id);
 			$("#parent_ids").val(parent_ids);
+			$("#name").val("");
+			$("#org_code").val("");
+			$("#org_type").val("0");
 			$("#submit").attr("onclick","submit_data()");	 
 			$(".add_Modal").click();	  //打开窗口
 			//修改节点图标  
@@ -166,58 +168,14 @@ $(function(){
 			$(".add_Modal").click();	  //打开窗口
 		}); 
 	}
-	/*右键处理函数*/
-	function OnRightClick(event, treeId, treeNode) {	
-		if (!treeNode && event.target.tagName.toLowerCase() != "button" 
-			&& $(event.target).parents("a").length == 0 && event.eventPhase == 3
-			) {//根节点
-			zTree.cancelSelectedNode();
-			showRMenu("root", event.clientX, event.clientY);//右键菜单
-		} else if (treeNode && !treeNode.noR) {//普通节点
-			zTree.selectNode(treeNode);
-			showRMenu("node", event.clientX, event.clientY);//右键菜单
-		}
-	}
-	/*右键菜单函数*/
-	function showRMenu(type, x, y) {
-		$("#rMenu ul").show();
-		if (type=="root") {
-			$("#m_del").hide();
-			$("#m_modify").hide();
-		} else {
-			$("#m_del").show();
-			$("#m_modify").show();
-		}
-		rMenu.css({"top":y+"px", "left":x+"px", "visibility":"visible"});//加样式
-
-		$("body").bind("mousedown", onBodyMouseDown);
-	}
-	/*选择之后隐藏菜单*/
-	function hideRMenu() {
-		if (rMenu) rMenu.css({"visibility": "hidden"});
-		$("body").unbind("mousedown", onBodyMouseDown);
-	}
-	/*选择菜单打开之后，单击空白隐藏*/
-	function onBodyMouseDown(event){
-		if (!(event.target.id == "rMenu" || $(event.target).parents("#rMenu").length>0)) {
-			rMenu.css({"visibility" : "hidden"});//选择菜单
-		}
-	}
-	/*添加下级单位*/
-	function addTreeNode(){
-		hideRMenu();
-		var nodes = zTree.getSelectedNodes();//选中的节点
-		var id = nodes[0].id;
-		$("#up_duty_name").val(nodes[0].name);
-		$("#duty_name").val("");
-		var e = getEvent();
-		showAddMenu(e.clientX, e.clientY);
-	}
+	
 	/*删除本级单位，会将本级和所有下属单位都删除*/
 	function removeTreeNode(id,table_obj){
 		
 		var nodes = zTree.getNodeByParam("id",id);//ztree节点
-		console.log(nodes.children);
+		console.log(nodes);
+		console.log(table_obj.data("tt-branch"));
+		var hasChil = nodes == null ? table_obj.data("tt-branch"):nodes.isParent;
 		$.ajax({
 			url:"../../delete_duty.do",
 			data:{"id":id},
@@ -225,15 +183,13 @@ $(function(){
 			dataType:"json",
 			async:true,
 			beforeSend:function(){
-				if (nodes) {
-					if (nodes.children && nodes.children.length > 0) {
-						var msg = "要删除的节点是父节点，如果删除将连同下属单位一起删掉。\n\n请确认是否要删除？";					
-						return confirm(msg);
-					}else{
-						var msg = "请确认是否要删除？";								
-						return confirm(msg);
-					}
-				}				
+				if ( hasChil ) {
+					var msg = "要删除的节点是父节点，如果删除将连同下属单位一起删掉。\n\n请确认是否要删除？";					
+					return confirm(msg);
+				}else{
+					var msg = "请确认是否要删除？";								
+					return confirm(msg);
+				}			
 			},
 			success:function(response){
 				console.log(response);
@@ -250,76 +206,6 @@ $(function(){
 				console.log(e);	
 			}
 		});
-	}
-	/*修改单位*/
-	function modifyTree(){
-		hideRMenu();
-		console.log("修改");
-	}
-	/*右键菜单函数*/
-	function showAddMenu(x, y) {
-		add_Menu.show();
-		$("#page_bg").show();//开背景
-		add_Menu.css({"top":y+"px", "left":x+"px", "visibility":"visible"});//加样式
-
-		$("body").bind("mousedown", onBodyMouseDown);
-	}
-	var getEvent = function(){
-	    return window.event || arguments.callee.caller.arguments[0];
-	}
-	function closeAddMenu(){
-		add_Menu.css({"visibility" : "hidden"});//关闭单位信息添加菜单
-		$("#page_bg").show();
-		$("#page_bg").hide();//关背景		
-	}
-	/*提交新添加的单位信息*/
-	function sumitAddInfo(){		
-		var nodes = zTree.getSelectedNodes()[0];
-		/*获取表单中的信息*/	
-		var data = serializeToJSON($("#form_add_unit"));
-		data.parent_id = nodes.id;
-		data.parent_ids = nodes.parent_ids;
-		$.ajax({
-			url:"../../add_unit.do",
-			data:JSON.stringify(data),
-			type:"POST",
-			dataType:"json",
-			contentType:"application/json;charset=UTF-8",
-			async:true,
-			beforeSend:function(){
-				/*获取表单中的信息，并做非空判断*/	
-				var up_duty_name = $("#up_duty_name").val();
-				var name = $("#name").val();
-				var sort = $("#sort").val();
-				var area_id = $("#area_id").val();
-				var code = $("#code").val();
-				var type = $("#type").val();
-				if( "" == up_duty_name||"" == name 
-					||"" == sort ||	"" == area_id
-					||"" == code||"" == type){
-					show_message("提示","*号是必填项，请确认填写完整！");
-					return false;
-				}
-			},
-			success:function(response){
-				if( response.state == 1 ){
-					closeAddMenu();//关闭窗口
-					show_message("信息","已成功添加");
-					var newNode = response.data;										
-					if (nodes) {
-						newNode.checked = nodes.checked;
-						zTree.addNodes(nodes, newNode);
-					} else {
-						zTree.addNodes(null, newNode);
-					}
-				}else{
-					show_message("提示",response.messages);
-				}
-			},
-			error:function(e){
-				console.log(e);
-			},
-		});		
 	}
 	//表单中含name属性的全部转json
 	function serializeToJSON(form) {

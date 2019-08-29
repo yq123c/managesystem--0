@@ -68,7 +68,7 @@ public class OrganizationService {
 	}
 	private void getSubordinateUnits(List<Map<String,Object>> unitList,List<Map<String,Object>> returnUnits) {
 		for(Map<String,Object> unit : unitList) {
-			int hasNext = Integer.parseInt(unit.get("isparent").toString());//是否还有下级单位
+			int hasNext = Integer.parseInt(unit.get("isParent").toString());//是否还有下级单位
 			if( hasNext > 0 ){//有下级单位
 				List<Map<String,Object>> tempUnitList = dao.getUnitInfoById(unit.get("id").toString());//获取该单位的下级单位列表
 				/*递归调用，当某个单位没有下级单位时退出调用，因此删除的单位所包含下属单位越多，删除时间越长*/

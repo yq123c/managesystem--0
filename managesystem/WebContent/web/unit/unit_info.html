@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="../../resources/js/layui/css/layui.css"  media="all">
 <link rel="stylesheet" href="../../resources/js/ztree/metroStyle/metroStyle.css" type="text/css">
 <link rel="stylesheet" href="../../resources/js/ztree/ztree.css" type="text/css">
-<link rel="stylesheet" href="../../css/unit-info/unitInfo.css" type="text/css">
+
 <link rel="stylesheet" href="../../resources/font-awesome-4.7.0/css/font-awesome.css">
 
 <script type="text/javascript" src="../../resources/js/jquery/jquery-3.4.0.min.js"></script>
@@ -101,14 +101,6 @@
 			</div>
 		</div>
 	</div>
-	<div id="page_bg"></div>
-	<div id="rMenu">
-		<ul>
-			<li id="m_add" onclick="addTreeNode();">添加下级</li>
-			<li id="m_del" onclick="removeTreeNode();">删除本级</li>
-			<li id="m_modify" onclick="modifyTree();">修改信息</li>
-		</ul>
-	</div>
 	<input type="hidden" class="add_Modal" data-toggle="modal" data-target="#add_Modal" value="">
   	<div class="modal fade" id="add_Modal">
 	    <div class="modal-dialog">
@@ -118,7 +110,6 @@
 	        </div>
 	        <div class="modal-body ">
 	        	<form id="form_org">
-	        		<input type="hidden" id="id" value="">
 	        		<input type="hidden" id="parent_id" value="">
 	        		<input type="hidden" id="parent_ids" value="">
 				     <div class="input-group mb-3">
