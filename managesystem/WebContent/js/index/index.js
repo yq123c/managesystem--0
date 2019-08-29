@@ -65,12 +65,10 @@ function login_out(){
 }
 /*显示内容*/
 function showContent(id,src){	
-	console.log(0);
 	if($("#"+id).length == 0){
 		$("#home").after(" <iframe id=\""+id+"\" class=\"col-sm-11\" src=\""+src+"\" style=\"border:0px;height:"+height+"px;\"></iframe>");
 	}else{
 		if( src.indexOf("?update=") > 0 ){
-			console.log(1);
 			$("#"+id).attr("src",src);
 		}
 	}

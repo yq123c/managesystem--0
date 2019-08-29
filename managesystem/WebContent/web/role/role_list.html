@@ -5,23 +5,72 @@
 <meta charset="UTF-8">
 <title>角色列表信息</title>
 <link rel="stylesheet" type="text/css" href="../../resources/js/bootstrap/css/bootstrap.css"/>
-<link rel="stylesheet" type="text/css" href="../../resources/js/bootstrap/bootstrapTable/css/bootstrap-table.min.css"/>
+<link rel="stylesheet" type="text/css" href="../../resources/js/bootstrap/bootstrapTable/css/bootstrap-table.css"/>
 <link rel="stylesheet" type="text/css" href="../../resources/js/layer-v3.0.1/skin/default/layer.css"/>
-
+<link rel="stylesheet" href="../../resources/font-awesome-4.7.0/css/font-awesome.css">
 <script type="text/javascript" src="../../resources/js/jquery/jquery-3.4.0.min.js"></script>
 
 <script type="text/javascript" src="../../resources/js/bootstrap/js/popper.min.js"></script>
 <script type="text/javascript" src="../../resources/js/bootstrap/js/bootstrap.js"></script>
-<script type="text/javascript" src="../../resources/js/bootstrap/bootstrapTable/bootstrap-table.min.js"></script>
+<script type="text/javascript" src="../../resources/js/bootstrap/bootstrapTable/bootstrap-table.js"></script>
 <script type="text/javascript" src="../../resources/js/bootstrap/bootstrapTable/locale/bootstrap-table-zh-CN.js"></script>
 <script type="text/javascript" src="../../resources/js/layer-v3.0.1/layer.js"></script>
 <script src="../../js/util/common_util.js"></script>
 <script src="../../js/role/role_list.js"></script>
+<style type="text/css">
+#roleList-table > thead tr th {
+      padding: 0;
+      margin: 0;
+      background-color: #166ac5;
+      color:white;
+      text-align: center;
+}
+ #roleList-tabletbody > tr:hover {
+       background-color: #dc3545;    
+}
+ #roleList-table tbody > tr{
+ 	text-align: center;
+ }
+</style>
 </head>
 <body>
-<div class="table-div" id="table-div">
-	<table id="roleList-table"  data-height="652">
-	</table>
-</div>
+	<div id="toolbar" class="bg-info text-white">		
+			<span>注：角色信息表 ..</span>	
+	</div>
+	<div class="container ">
+		<table id="roleList-table"  ></table>
+	</div>
+	<input type="hidden" class="add_Modal" data-toggle="modal" data-target="#add_Modal" value="">
+  	<div class="modal fade" id="add_Modal">
+	    <div class="modal-dialog">
+	      <div class="modal-content">
+	        <div class="modal-header">
+	          <h4 class=" container modal-title alert alert-primary"><span class="text-center">角色新增</span><button type="button" class="close" data-dismiss="modal">&times;</button></h4>	          
+	        </div>
+	        <div class="modal-body ">
+	        	<form id="form_role">
+	        		<input type="hidden" id="parent_id" value="">
+	        		<input type="hidden" id="parent_ids" value="">
+				     <div class="input-group mb-3">
+					      <div class="input-group-prepend">
+					        <span class="input-group-text">角色名称<span style="color: red;">*</span></span>
+					      </div>
+					      <input type="text" class="form-control" placeholder="输入名称" id="role_name"name="role_name">
+				    </div>
+				     <div class="input-group mb-3">
+					      <div class="input-group-prepend">
+					        <span class="input-group-text">角色描述<span style="color: red;">*</span></span>
+					      </div>
+					      <input type="text" class="form-control" placeholder="输入描述" id="description"name="description">
+				    </div>
+			  </form>
+	        </div>	   
+	        <div class="modal-footer">
+	        	<button type="submit" class="btn btn-primary"   onclick="ensure_add()">确认</button>
+	          	<button type="button" class="btn btn-secondary" id="close"data-dismiss="modal">关闭</button>
+	        </div>	   
+	      </div>
+	    </div>
+  	</div>    
 </body>
 </html>

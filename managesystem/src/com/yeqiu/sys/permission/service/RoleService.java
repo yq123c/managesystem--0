@@ -19,9 +19,10 @@ import com.yeqiu.sys.common.util.UUIDUtil;
 import com.yeqiu.sys.permission.dao.RoleDao;
 
 /**
- * @author 陆昌
- * @time 2019年5月20日下午2:46:28
- * 说明：角色权限控制service层
+ * 
+ * @author LC
+ *创建时间：2019年8月29日下午4:52:41
+ *说明：角色权限控制service层
  */
 @Service
 public class RoleService {
@@ -45,8 +46,7 @@ public class RoleService {
 	 * @return
 	 */
 	public ResponseResult addRole( Map<String,String> roleInfo) {
-		ResponseResult returnResult = null;
-		roleInfo.put("createPersion", "sys");
+		ResponseResult returnResult = null;		
 		roleInfo.put("id", UUIDUtil.getUUID());
 		try {
 			int res = roleDao.addRole(roleInfo);
@@ -90,10 +90,15 @@ public class RoleService {
 	 * @param id
 	 * @return
 	 */
-	public String getOperationList(String id) {
-		List<Map<String,Object>> operationList = roleDao.getOperationList(id);	
-		String result = JsonUtil.objectToJson(SqlDataHandle.listDataHandle(operationList));
-		return result;
+	public List<Map<String,Object>> getOperationList(String id) {
+		try {
+			List<Map<String,Object>> operationList = roleDao.getOperationList(id);	
+			return operationList;
+		} catch (Exception e) {
+			logger.error("出错了", e);
+			return null;
+		}
+	
 	}
 	/**
 	 * 添加操作权限
@@ -104,7 +109,6 @@ public class RoleService {
 		ResponseResult returnResult = null;
 		operationInfo.put("id", UUIDUtil.getUUID());
 		Object temp = SecurityUtils.getSubject().getPrincipal();
-		System.out.println(temp);
 		try {
 			int res = roleDao.addOperation(operationInfo);
 			if( res > 0 ) {
@@ -167,7 +171,7 @@ public class RoleService {
 	public ResponseResult authorize(List<Map<String,String>> authorizeInfo) {
 		ResponseResult returnResult = null;
 		try {
-			String id = authorizeInfo.get(0).get("ROLE_ID").toString();//角色id
+			String id = authorizeInfo.get(0).get("role_id").toString();//角色id
 			/*已经存在的授权信息*/
 			List<Map<String,String>> existAuthorizeInfo = roleDao.getRolePermission(id);
 			for( Map<String,String> aboutToAdd : authorizeInfo  ) {		

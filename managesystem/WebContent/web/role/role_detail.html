@@ -59,9 +59,9 @@ input[type="checkbox"] {
 			  data: "id=-1",  
 			  type:"post",
 			  dataType:"json",
-			  success:function(data) { 
-				root_info = JSON.parse(data);    
-				var html = generateHtml("-1",root_info);    
+			  success:function(data) {   
+				  root_info = data;
+				var html = generateHtml("-1",data);    
 				$("#tree_table tbody").append(html);//根初始化
 			  	set_tree_table(); //表格初始化		
 			  	expand_role_has_permission();//展开角色已经拥有的授权信息
@@ -87,8 +87,7 @@ input[type="checkbox"] {
 	 					  data: data,  
 	 					  type:"post",
 	 					  dataType:"json",
-	 					  success:function(data) { 
-	 						var data = JSON.parse(data);    						
+	 					  success:function(data) { 						
 	  					 	var html = generateHtml(node.id,data);      					
 	                    	$("#tree_table").treetable("loadBranch",node,html);    	                    
 	      				}      
@@ -118,13 +117,13 @@ input[type="checkbox"] {
 					var result = JSON.parse(data.messages);
 					for(x in result ){
 						for(y in root_info ){
-							if( result[x].OPERATION_ID === root_info[y].id ){
+							if( result[x].permission_id === root_info[y].id ){
 								$("#tree_table").treetable("expandNode",root_info[y].id);   //展开树根 
 							}
 						}
 					}
 					for(x in result ){//勾选已存在的的权限选项
-						var item = $("#"+result[x].OPERATION_ID);
+						var item = $("#"+result[x].permission_id);
 						if( !item.prop("checked") ){
 							item.prop("checked",true);
 						}						
@@ -168,8 +167,8 @@ function submit_select_data(){
 	$('input[type="checkbox"]:checked').each(function(index){
 		var item = $(this);
 		var temp_obj={};		
-		temp_obj.ROLE_ID = id;
-		temp_obj.OPERATION_ID = item.val();
+		temp_obj.role_id = id;
+		temp_obj.permission_id = item.val();
 		permissionArray[index] = temp_obj;
 	});
 	var data = JSON.stringify(permissionArray);
@@ -210,35 +209,37 @@ function choose_me(parent_id,id){
 </script>
 </head>
 <body>
-	<div class="">
-		<div class="card">
-			<div class="card-header bg-secondary text-white">
-				角色名称：<span id="name"></span>
-			</div>
-			<div class="card-body">
-				角色描述：<span id="description"></span>
+	<div class="container">
+		<div >
+			<div class="card">
+				<div class="card-header bg-secondary text-white">
+					角色名称：<span id="name"></span>
+				</div>
+				<div class="card-body">
+					角色描述：<span id="description"></span>
+				</div>
 			</div>
 		</div>
+		 <div id="main">  
+	       <table id="tree_table">  
+	        <thead>  
+	          <tr>  
+	            <th>名称</th>  
+	            <th>描述</th> 
+	            <th>权限</th>  
+	            <th>选择</th>  
+	          </tr>  
+	        </thead>  
+	        <tbody>                     
+	        </tbody>  
+	      </table>        
+	    </div>  
+	    <div class="clearfix">
+	     <button type="button" class="btn btn-outline-info float-left"  onclick="javascript :history.back(-1);">返回</button>   	   	 
+	    <div class="mx-auto " style="width:150px">
+	    	<button type="button" class="btn btn-outline-success"  onclick="submit_select_data()">确认授权</button>   	    		
+	    </div>
+	  </div>
 	</div>
-	 <div id="main">  
-       <table id="tree_table">  
-        <thead>  
-          <tr>  
-            <th>名称</th>  
-            <th>描述</th> 
-            <th>权限</th>  
-            <th>选择</th>  
-          </tr>  
-        </thead>  
-        <tbody>                     
-        </tbody>  
-      </table>        
-    </div>  
-    <div class="clearfix">
-     <button type="button" class="btn btn-outline-info float-left"  onclick="javascript :history.back(-1);">返回上级</button>   	   	 
-    <div class="mx-auto " style="width:150px">
-    	<button type="button" class="btn btn-outline-success"  onclick="submit_select_data()">确认授权</button>   	    		
-    </div>
-  </div>
 </body>
 </html>

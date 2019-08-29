@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.AuthorizationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.stereotype.Controller;
@@ -18,9 +19,10 @@ import com.yeqiu.sys.permission.service.RoleService;
 import com.yeqiu.sys.user.realm.UserRealm;
 
 /**
- * @author 陆昌
- * @time 2019年5月20日下午2:40:48
- * 说明：基于资源的访问控制器，权限集合在角色中
+ * 
+ * @author LC
+ *创建时间：2019年8月29日下午3:55:47
+ *说明：基于资源的访问控制器，权限集合在角色中
  */
 @Controller
 @RequestMapping("role")
@@ -37,7 +39,13 @@ public class RoleController extends ApplicationObjectSupport{
 	@RequestMapping("get_list")
 	@ResponseBody
 	public Map<String,Object> getRoleList(int limit,int offset,String sort,String sortOrder){
-		return service.getRoleList(limit, offset, sort, sortOrder);
+		try {
+			return service.getRoleList(limit, offset, sort, sortOrder);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
 	}
 	/**
 	 * 添加角色
@@ -50,8 +58,11 @@ public class RoleController extends ApplicationObjectSupport{
 		try {
 			SecurityUtils.getSubject().checkRole("admin");
 			return service.addRole(roleInfo);
-		} catch (Exception e) {
+		} catch (AuthorizationException e) {
 			return new ResponseResult(ResponseResult.STATE_FAIL,"对不起，您无此操作权限");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseResult(ResponseResult.STATE_FAIL,"对不起，服务器出了差错");
 		}				
 	}
 	/**
@@ -79,11 +90,16 @@ public class RoleController extends ApplicationObjectSupport{
 	 */
 	@RequestMapping(value="operation_list",produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public String getOperationList(String id) {
-		if( id== null || "".equals(id) ) {
-			id="-1";
+	public Object getOperationList(String id) {
+		try {
+			if( id== null || "".equals(id) ) {
+				id="-1";
+			}
+			return service.getOperationList(id.trim());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		}
-		return service.getOperationList(id.trim());
 	}
 	/**
 	 * 添加操作权限
@@ -156,11 +172,16 @@ public class RoleController extends ApplicationObjectSupport{
 	@RequestMapping(value="already_authorize",produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public ResponseResult getAuthorizeInfo(String roleId) {
-		
-		if( roleId == null || "".equals(roleId) ) {
-			return new ResponseResult(ResponseResult.STATE_FAIL,"错误，角色id不能为空");	
+		try {
+			if( roleId == null || "".equals(roleId) ) {
+				return new ResponseResult(ResponseResult.STATE_FAIL,"错误，角色id不能为空");	
+			}
+			return service.getAuthorizeInfo(roleId);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseResult(ResponseResult.STATE_FAIL,"服务器出了点差错");	
 		}
-		return service.getAuthorizeInfo(roleId);
+	
 	}
 	
 	@ResponseBody

@@ -63,8 +63,7 @@ function init_tree_table(){
 		  data: "id=-1",  
 		  type:"post",
 		  dataType:"json",
-		  success:function(data) { 
-			var data = JSON.parse(data);    					
+		  success:function(data) {    					
 			var html = generateHtml("-1",data);    
 			$("#tree_table tbody").append(html);//根初始化
 		  	set_tree_table(); //表格初始化
@@ -91,8 +90,7 @@ function set_tree_table(){
  					  data: data,  
  					  type:"post",
  					  dataType:"json",
- 					  success:function(data) { 
- 						var data = JSON.parse(data);    						
+ 					  success:function(data) {   						
   					 	var html = generateHtml(node.id,data);      					
                     	$("#tree_table").treetable("loadBranch",node,html);    
       				}      
@@ -219,7 +217,7 @@ function del_operation(id){
 </script>
 </head>
 <body>
-	 <div id="main">  
+	 <div id="main" class="container">  
        <table id="tree_table">  
         <thead>  
           <tr>  
@@ -241,19 +239,25 @@ function del_operation(id){
 	          <h4 class=" container modal-title alert alert-primary"><span class="text-center">添加权限</span><button type="button" class="close" data-dismiss="modal">&times;</button></h4>	          
 	        </div>
 	        <div class="modal-body ">
-	        	<form id="form_permission">
-				    <div class="form-group">
-				      <label for="operation_name">名称:</label>
+	        	<form id="form_permission">	        
+				    <div class="input-group">
+				      <div class="input-group-prepend">
+					        <span class="input-group-text">名称<span style="color: red;">*</span></span>
+					      </div>
 				      <input type="text" class="form-control" id="name" placeholder="请输入名称">
 				    </div>
-				    <div class="form-group">
-				      <label for="description">描述:</label>
+				    <div class="input-group">
+				      <div class="input-group-prepend">
+					        <span class="input-group-text">描述<span style="color: red;">*</span></span>
+					      </div>
 				      <input type="text" class="form-control" id="description" placeholder="请输入描述">
 				    </div>
-				     <div class="form-group">
-				      <label for="permission">权限:</label>
-				      <input type="text" class="form-control" id="permission" placeholder="请输入权限">
-				    </div>				    
+				    <div class="input-group">
+				      <div class="input-group-prepend">
+					        <span class="input-group-text">权限<span style="color: red;">*</span></span>
+					      </div>
+				       <input type="text" class="form-control" id="permission" placeholder="请输入权限">
+				    </div>				 
 			  </form>
 	        </div>	   
 	        <div class="modal-footer">

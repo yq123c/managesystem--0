@@ -5,7 +5,7 @@
 <!--  获取所有的角色列表 -->
 <!-- public List<Map<String,Object>> getRoleList(int limit,int offset,String sort,String sortOrder) -->
 <select id="getRoleList" resultType="map">
-select * from sys_role t 
+select t.* from t_sys_role t 
     <if test="sort != null">
     	order by ${sort} <if test="sortOrder != null">${sortOrder}</if>   
     </if>
@@ -16,20 +16,18 @@ select * from sys_role t
 <!-- 获取角色记录总数 -->
 <!-- public Integer getRecordCountOfRoles() -->
 <select id="getRecordCountOfRoles" resultType="int">
-	select count(t.id) total from sys_role t
+	select count(t.id) total from t_sys_role t
 </select>
 <!-- 添加角色 -->
 <!-- public Integer addRole( Map<String,String> roleInfo) -->
 <insert id="addRole" parameterType="map">
 insert into 
-    sys_role 
+    t_sys_role 
 values(
     #{roleInfo.id,jdbcType=VARCHAR},
     #{roleInfo.role_name,jdbcType=VARCHAR},
     #{roleInfo.description,jdbcType=VARCHAR},
-    #{roleInfo.createPersion,jdbcType=VARCHAR},
     now(),
-    #{roleInfo.createPersion,jdbcType=VARCHAR},
     now()
 )
 </insert>
@@ -37,7 +35,7 @@ values(
 <!-- public Integer deleteRole(String id) -->
 <delete id="deleteRole">
 delete t
-	from sys_role t
+	from t_sys_role t
 where 
 	t.id = #{id,jdbcType=VARCHAR}
 </delete>
@@ -46,31 +44,27 @@ where
 <select id="getOperationList" resultType="map">
 select t.id,
        t.parent_id,
-       t.parent_ids,
        t.name,
        t.permission,
        t.description,
-       t.create_person,
        t.create_time,
-       (select count(o.id) from sys_operation o where o.parent_id=t.id)isParent   
-  from sys_operation t
+       t.modify_time,
+       (select count(o.id) from t_sys_operation o where o.parent_id=t.id)isParent   
+  from t_sys_operation t
 where t.parent_id = #{id,jdbcType=VARCHAR}
 </select>
 <!-- 添加操作权限 -->
 <!-- public Integer addOperation( @Param("operationInfo") Map<String,String> operationInfo ) -->
 <insert id="addOperation" parameterType="map">
 insert into 
-    sys_operation 
+    t_sys_operation
 values(
     #{operationInfo.id,jdbcType=VARCHAR},
-    #{operationInfo.parent_id,jdbcType=VARCHAR},
     #{operationInfo.parent_id,jdbcType=VARCHAR},
     #{operationInfo.name,jdbcType=VARCHAR},
     #{operationInfo.permission,jdbcType=VARCHAR},
     #{operationInfo.description,jdbcType=VARCHAR},
-    #{operationInfo.login_name,jdbcType=VARCHAR},
     now(),
-     #{operationInfo.login_name,jdbcType=VARCHAR},
     now()
 )
 </insert>
@@ -78,7 +72,7 @@ values(
 <!-- public Integer deleteOperation(String id) -->
 <delete id="deleteOperation">
 delete t
-	from sys_operation t
+	from t_sys_operation t
 where
 	t.id=#{id,jdbcType=VARCHAR}
 </delete>
@@ -86,9 +80,9 @@ where
 <!-- public List<Map<String,String>> getRolePermission(String id) -->
 <select id="getRolePermission"  resultType="map">
 select 
-  * 
+  t.* 
 from 
-  sys_role_opration t
+  t_role_permission t
 where 
 	t.role_id = #{id,jdbcType=VARCHAR}
 </select>
@@ -96,21 +90,21 @@ where
 <!-- public Integer addAuthorizeInfo(@Param("authorizeInfo")Map<String,String > authorizeInfo) -->
 <insert id="addAuthorizeInfo" parameterType="map">
 insert into
-	sys_role_opration 
+	t_role_permission 
 values(
-	#{authorizeInfo.ROLE_ID,jdbcType=VARCHAR},
-	#{authorizeInfo.OPERATION_ID,jdbcType=VARCHAR}
+	#{authorizeInfo.role_id,jdbcType=VARCHAR},
+	#{authorizeInfo.permission_id,jdbcType=VARCHAR}
 )
 </insert>
 <!-- 删除授权信息 -->
 <!-- public Integer deleteAuthorizeInfo(@Param("authorizeInfo")Map<String,String > authorizeInfo) -->
 <delete id="deleteAuthorizeInfo" parameterType="map">
 delete t
-	from sys_role_opration t
+	from t_role_permission t
 where
-	t.role_id = #{authorizeInfo.ROLE_ID,jdbcType=VARCHAR}
+	t.role_id = #{authorizeInfo.role_id,jdbcType=VARCHAR}
 	and 
-	t.operation_id =#{authorizeInfo.OPERATION_ID,jdbcType=VARCHAR}
+	t.permission_id =#{authorizeInfo.permission_id,jdbcType=VARCHAR}
 </delete>
 
 <!-- 按用户ID查角色 -->
@@ -118,7 +112,7 @@ where
 select 
  id,name,description,create_person,create_time,modify_person,modify_time
 from 
-       sys_role r 
+       t_sys_role r 
 where 
 	   r.id in (
 	   		select ur.role_id 

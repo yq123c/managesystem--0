@@ -4,9 +4,10 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 /**
- * @author 陆昌
- * @time 2019年5月20日下午2:43:19
- * 说明：角色权限控制持久层
+ * 
+ * @author LC
+ *创建时间：2019年8月29日下午4:52:52
+ *说明：角色权限控制持久层
  */
 @Repository
 public interface RoleDao {
