@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Index</title>
+</head>
+<body>
+    姓名：<input type="text" th:value="${name}"><br/>
+    年龄：<input type="text" th:value="${age}"><br/>
+    简介：<textarea rows="1" cols="60" th:text="${info}"></textarea>
+</body>
+</html>

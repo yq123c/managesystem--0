@@ -1,4 +1,0 @@
-driver=oracle.jdbc.driver.OracleDriver
-url=jdbc\:oracle\:thin\:@10.1.5.149\:1521\:orclsnew
-username=qxxt
-password=qxxt
